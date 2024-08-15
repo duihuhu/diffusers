@@ -76,7 +76,6 @@ class CogVideoXBlock(nn.Module):
         ff_inner_dim: Optional[int] = None,
         ff_bias: bool = True,
         attention_out_bias: bool = True,
-        layer: Optional[int] = 0,
     ):
         super().__init__()
 
@@ -104,14 +103,14 @@ class CogVideoXBlock(nn.Module):
             inner_dim=ff_inner_dim,
             bias=ff_bias,
         )
-        self.layer = layer
 
     def forward(
         self,
         hidden_states: torch.Tensor,
         encoder_hidden_states: torch.Tensor,
         temb: torch.Tensor,
-        step: int,
+        cur_step: int,
+        cur_layer: int,
         atten_cache: dict,
     ) -> torch.Tensor:
         norm_hidden_states, norm_encoder_hidden_states, gate_msa, enc_gate_msa = self.norm1(
@@ -126,15 +125,15 @@ class CogVideoXBlock(nn.Module):
         # CogVideoX uses concatenated text + video embeddings with self-attention instead of using
         # them in cross-attention individually
         norm_hidden_states = torch.cat([norm_encoder_hidden_states, norm_hidden_states], dim=1)
-        print("step, block layer", step, self.layer)
-        # if step %2 ==0:
-        attn_output = self.attn1(
-            hidden_states=norm_hidden_states,
-            encoder_hidden_states=None,
-        )
-        #     atten_cache[-1][self.layer]['atten_cache'] = attn_output
-        # else:
-        #     attn_output = atten_cache[-1][self.layer]['atten_cache']
+        print("step, block layer", cur_step, cur_layer)
+        if cur_step %2 ==0:
+            attn_output = self.attn1(
+                hidden_states=norm_hidden_states,
+                encoder_hidden_states=None,
+            )
+            atten_cache[-1][cur_layer]['atten_cache'] = attn_output
+        else:
+            attn_output = atten_cache[-1][cur_layer]['atten_cache']
         torch.cuda.synchronize()
         t3 = time.time()
         hidden_states = hidden_states + gate_msa * attn_output[:, text_length:]
@@ -266,7 +265,6 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     attention_bias=attention_bias,
                     norm_elementwise_affine=norm_elementwise_affine,
                     norm_eps=norm_eps,
-                    layer = _,
                 )
                 for _ in range(num_layers)
             ]
@@ -295,6 +293,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         timestep: Union[int, float, torch.LongTensor],
         timestep_cond: Optional[torch.Tensor] = None,
         return_dict: bool = True,
+        cur_step: int = 0,
         atten_cache: dict = {},
     ):
         batch_size, num_frames, channels, height, width = hidden_states.shape
@@ -347,11 +346,13 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     **ckpt_kwargs,
                 )
             else:
+                print("block in fo ", cur_step, i)
                 hidden_states, encoder_hidden_states = block(
                     hidden_states=hidden_states,
                     encoder_hidden_states=encoder_hidden_states,
                     temb=emb,
-                    step=i,
+                    cur_step=cur_step,
+                    cur_layer=i,
                     atten_cache=atten_cache,
                 )
         torch.cuda.synchronize()
