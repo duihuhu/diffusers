@@ -457,7 +457,6 @@ class CogVideoXPipeline(DiffusionPipeline):
         ] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         max_sequence_length: int = 226,
-        atten_cache: dict = {},
     ) -> Union[CogVideoXPipelineOutput, Tuple]:
         """
         Function invoked when calling the pipeline for generation.
@@ -613,6 +612,12 @@ class CogVideoXPipeline(DiffusionPipeline):
         # 7. Denoising loop
         num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
         current_step = 0 
+        atten_cache = {}
+
+        for i in range(30):
+            atten_cache[i] = {}
+            atten_cache[i]['atten_cache'] = -1
+            
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             # for DPM-solver++
             old_pred_original_sample = None
