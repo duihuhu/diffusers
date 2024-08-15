@@ -625,6 +625,7 @@ class CogVideoXPipeline(DiffusionPipeline):
 
                 # broadcast to batch dimension in a way that's compatible with ONNX/Core ML
                 timestep = t.expand(latent_model_input.shape[0])
+                torch.cuda.synchronize()
                 t2 = time.time()
 
                 # predict noise model_output
@@ -635,6 +636,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     return_dict=False,
                 )[0]
                 noise_pred = noise_pred.float()
+                torch.cuda.synchronize()
                 t3 = time.time()
 
                 # perform guidance
@@ -660,6 +662,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                         return_dict=False,
                     )
                 latents = latents.to(prompt_embeds.dtype)
+                torch.cuda.synchronize()
                 t4 = time.time()
 
                 # call the callback, if provided
@@ -672,6 +675,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     latents = callback_outputs.pop("latents", latents)
                     prompt_embeds = callback_outputs.pop("prompt_embeds", prompt_embeds)
                     negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
+                torch.cuda.synchronize()
                 t5 = time.time()
                 print("execute time ", t5-t4, t4-t3, t3-t2, t2-t1)
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
