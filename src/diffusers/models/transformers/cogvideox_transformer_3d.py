@@ -111,7 +111,7 @@ class CogVideoXBlock(nn.Module):
         temb: torch.Tensor,
         cur_step: int,
         cur_layer: int,
-        atten_cache: None,
+        atten_cache: {},
     ) -> torch.Tensor:
         norm_hidden_states, norm_encoder_hidden_states, gate_msa, enc_gate_msa = self.norm1(
             hidden_states, encoder_hidden_states, temb
@@ -129,9 +129,9 @@ class CogVideoXBlock(nn.Module):
             hidden_states=norm_hidden_states,
             encoder_hidden_states=None,
         )
-        if cur_step % 2 == 0:
-            atten_cache = attn_output
-            print("store cur_step cur_layer ",cur_step, cur_layer, atten_cache)
+        # if cur_step % 2 == 0:
+        atten_cache[cur_layer] = attn_output
+        print("store cur_step cur_layer ",cur_step, cur_layer, atten_cache)
 
         # else:
         #     print("get step, block layer", cur_step, cur_layer)
