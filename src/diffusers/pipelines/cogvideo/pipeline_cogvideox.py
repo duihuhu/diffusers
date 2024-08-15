@@ -615,6 +615,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         atten_cache = {}
 
         for i in range(30):
+            atten_cache[i] = {}
             atten_cache[i]['atten_cache'] = -1
             
         with self.progress_bar(total=num_inference_steps) as progress_bar:
