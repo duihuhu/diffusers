@@ -126,6 +126,7 @@ class CogVideoXBlock(nn.Module):
         # CogVideoX uses concatenated text + video embeddings with self-attention instead of using
         # them in cross-attention individually
         norm_hidden_states = torch.cat([norm_encoder_hidden_states, norm_hidden_states], dim=1)
+        print("step, block layer", step, self.layer)
         if step %2 ==0:
             attn_output = self.attn1(
                 hidden_states=norm_hidden_states,
