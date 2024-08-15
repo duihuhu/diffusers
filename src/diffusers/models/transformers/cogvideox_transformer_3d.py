@@ -281,6 +281,8 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
     ):
         batch_size, num_frames, channels, height, width = hidden_states.shape
 
+        import time
+        t1 = time.time()
         # 1. Time embedding
         timesteps = timestep
         t_emb = self.time_proj(timesteps)
@@ -290,10 +292,12 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         # there might be better ways to encapsulate this.
         t_emb = t_emb.to(dtype=hidden_states.dtype)
         emb = self.time_embedding(t_emb, timestep_cond)
-
+        torch.cuda.synchronize()
+        t2 = time.time()
         # 2. Patch embedding
         hidden_states = self.patch_embed(encoder_hidden_states, hidden_states)
-
+        torch.cuda.synchronize()
+        t3 = time.time()
         # 3. Position embedding
         seq_length = height * width * num_frames // (self.config.patch_size**2)
 
@@ -303,6 +307,8 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
 
         encoder_hidden_states = hidden_states[:, : self.config.max_text_seq_length]
         hidden_states = hidden_states[:, self.config.max_text_seq_length :]
+        torch.cuda.synchronize()
+        t4 = time.time()
 
         # 5. Transformer blocks
         for i, block in enumerate(self.transformer_blocks):
@@ -328,18 +334,27 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     encoder_hidden_states=encoder_hidden_states,
                     temb=emb,
                 )
+        torch.cuda.synchronize()
+        t5 = time.time()
 
         hidden_states = self.norm_final(hidden_states)
+        torch.cuda.synchronize()
+        t6 = time.time()
 
         # 6. Final block
         hidden_states = self.norm_out(hidden_states, temb=emb)
         hidden_states = self.proj_out(hidden_states)
+        torch.cuda.synchronize()
+        t7 = time.time()
 
         # 7. Unpatchify
         p = self.config.patch_size
         output = hidden_states.reshape(batch_size, num_frames, height // p, width // p, channels, p, p)
         output = output.permute(0, 1, 4, 2, 5, 3, 6).flatten(5, 6).flatten(3, 4)
+        torch.cuda.synchronize()
+        t8 = time.time()
 
+        print("cogvideox transformer3d model ", t8-t7, t7-t6, t6-t5, t5-t4, t4-t3, t3-t2, t2-t1 )
         if not return_dict:
             return (output,)
         return Transformer2DModelOutput(sample=output)

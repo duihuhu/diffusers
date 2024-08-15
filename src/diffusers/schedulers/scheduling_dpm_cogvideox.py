@@ -387,8 +387,6 @@ class CogVideoXDPMScheduler(SchedulerMixin, ConfigMixin):
         # - eta -> η
         # - pred_sample_direction -> "direction pointing to x_t"
         # - pred_prev_sample -> "x_t-1"
-        import time
-        t1 = time.time
         # 1. get previous step value (=t-1)
         prev_timestep = timestep - self.config.num_train_timesteps // self.num_inference_steps
 
@@ -398,7 +396,6 @@ class CogVideoXDPMScheduler(SchedulerMixin, ConfigMixin):
         alpha_prod_t_back = self.alphas_cumprod[timestep_back] if timestep_back is not None else None
 
         beta_prod_t = 1 - alpha_prod_t
-        t2 = time.time
 
         # 3. compute predicted original sample from predicted noise also called
         # "predicted x_0" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
@@ -421,7 +418,6 @@ class CogVideoXDPMScheduler(SchedulerMixin, ConfigMixin):
         h, r, lamb, lamb_next = self.get_variables(alpha_prod_t, alpha_prod_t_prev, alpha_prod_t_back)
         mult = list(self.get_mult(h, r, alpha_prod_t, alpha_prod_t_prev, alpha_prod_t_back))
         mult_noise = (1 - alpha_prod_t_prev) ** 0.5 * (1 - (-2 * h).exp()) ** 0.5
-        t3 = time.time
 
         noise = randn_tensor(sample.shape, generator=generator, device=sample.device, dtype=sample.dtype)
         prev_sample = mult[0] * sample - mult[1] * pred_original_sample + mult_noise * noise
@@ -435,8 +431,6 @@ class CogVideoXDPMScheduler(SchedulerMixin, ConfigMixin):
             x_advanced = mult[0] * sample - mult[1] * denoised_d + mult_noise * noise
 
             prev_sample = x_advanced
-        t4 = time.time
-        print("scheduler step ", t4-t3, t3-t2, t2-t1)
         if not return_dict:
             return (prev_sample, pred_original_sample)
 
