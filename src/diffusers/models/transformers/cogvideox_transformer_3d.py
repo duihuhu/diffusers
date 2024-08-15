@@ -76,6 +76,7 @@ class CogVideoXBlock(nn.Module):
         ff_inner_dim: Optional[int] = None,
         ff_bias: bool = True,
         attention_out_bias: bool = True,
+        layer: Optional[int] = 0,
     ):
         super().__init__()
 
@@ -103,12 +104,15 @@ class CogVideoXBlock(nn.Module):
             inner_dim=ff_inner_dim,
             bias=ff_bias,
         )
+        self.layer = layer
 
     def forward(
         self,
         hidden_states: torch.Tensor,
         encoder_hidden_states: torch.Tensor,
         temb: torch.Tensor,
+        step: int,
+        atten_cache: {},
     ) -> torch.Tensor:
         norm_hidden_states, norm_encoder_hidden_states, gate_msa, enc_gate_msa = self.norm1(
             hidden_states, encoder_hidden_states, temb
@@ -122,10 +126,14 @@ class CogVideoXBlock(nn.Module):
         # CogVideoX uses concatenated text + video embeddings with self-attention instead of using
         # them in cross-attention individually
         norm_hidden_states = torch.cat([norm_encoder_hidden_states, norm_hidden_states], dim=1)
-        attn_output = self.attn1(
-            hidden_states=norm_hidden_states,
-            encoder_hidden_states=None,
-        )
+        if step %2 ==0:
+            attn_output = self.attn1(
+                hidden_states=norm_hidden_states,
+                encoder_hidden_states=None,
+            )
+            atten_cache[-1][self.layer]['atten_cache'] = attn_output
+        else:
+            attn_output = atten_cache[-1][self.layer]['atten_cache']
         torch.cuda.synchronize()
         t3 = time.time()
         hidden_states = hidden_states + gate_msa * attn_output[:, text_length:]
@@ -257,6 +265,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     attention_bias=attention_bias,
                     norm_elementwise_affine=norm_elementwise_affine,
                     norm_eps=norm_eps,
+                    layer = _,
                 )
                 for _ in range(num_layers)
             ]
@@ -275,6 +284,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
 
         self.gradient_checkpointing = False
 
+        self.num_layers = num_layers
     def _set_gradient_checkpointing(self, module, value=False):
         self.gradient_checkpointing = value
 
@@ -317,6 +327,9 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         torch.cuda.synchronize()
         t4 = time.time()
 
+        atten_cache = {}
+        for i in len(self.num_layers):
+            atten_cache[-1][i]['atten_cache'] = -1
         # 5. Transformer blocks
         for i, block in enumerate(self.transformer_blocks):
             if self.training and self.gradient_checkpointing:
@@ -340,6 +353,8 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     hidden_states=hidden_states,
                     encoder_hidden_states=encoder_hidden_states,
                     temb=emb,
+                    step=i,
+                    atten_cache=atten_cache,
                 )
         torch.cuda.synchronize()
         t5 = time.time()
