@@ -650,7 +650,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                 )
                 noise_pred = res[0]
                 
-                print("atten_cache[i]['atten'] ", atten_cache[0]['atten'])
+                # print("atten_cache[i]['atten'] ", atten_cache[0]['atten'])
                 noise_pred = noise_pred.float()
                 current_step = current_step + 1
                 # perform guidance
