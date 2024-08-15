@@ -297,7 +297,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         timestep_cond: Optional[torch.Tensor] = None,
         return_dict: bool = True,
         cur_step: int = 0,
-        atten_cache: dict = {},
+        atten_cache = {},
     ):
         batch_size, num_frames, channels, height, width = hidden_states.shape
 
