@@ -131,7 +131,7 @@ class CogVideoXBlock(nn.Module):
                 encoder_hidden_states=None,
             )
             atten_cache[-1][cur_layer]['atten_cache'] = attn_output
-            print("store step, block layer", cur_step, cur_layer)
+            print("store step, block layer", cur_step, cur_layer, atten_cache[-1][cur_layer]['atten_cache'])
         else:
             print("get step, block layer", cur_step, cur_layer)
             attn_output = atten_cache[-1][cur_layer]['atten_cache']
