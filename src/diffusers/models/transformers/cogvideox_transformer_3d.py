@@ -133,6 +133,7 @@ class CogVideoXBlock(nn.Module):
             )
             atten_cache[-1][cur_layer]['atten_cache'] = attn_output
         else:
+            print(atten_cache[-1][cur_layer]['atten_cache'])
             attn_output = atten_cache[-1][cur_layer]['atten_cache']
         torch.cuda.synchronize()
         t3 = time.time()
