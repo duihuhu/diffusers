@@ -618,12 +618,14 @@ class CogVideoXPipeline(DiffusionPipeline):
             for i, t in enumerate(timesteps):
                 if self.interrupt:
                     continue
-
+                import time
+                t1 = time.time()
                 latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
 
                 # broadcast to batch dimension in a way that's compatible with ONNX/Core ML
                 timestep = t.expand(latent_model_input.shape[0])
+                t2 = time.time()
 
                 # predict noise model_output
                 noise_pred = self.transformer(
@@ -633,6 +635,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     return_dict=False,
                 )[0]
                 noise_pred = noise_pred.float()
+                t3 = time.time()
 
                 # perform guidance
                 if use_dynamic_cfg:
@@ -657,6 +660,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                         return_dict=False,
                     )
                 latents = latents.to(prompt_embeds.dtype)
+                t4 = time.time()
 
                 # call the callback, if provided
                 if callback_on_step_end is not None:
@@ -668,10 +672,11 @@ class CogVideoXPipeline(DiffusionPipeline):
                     latents = callback_outputs.pop("latents", latents)
                     prompt_embeds = callback_outputs.pop("prompt_embeds", prompt_embeds)
                     negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
-
+                t5 = time.time()
+                print("execute time ", t5-t4, t4-t3, t3-t2, t2-t1)
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
                     progress_bar.update()
-
+                    
         if not output_type == "latent":
             video = self.decode_latents(latents, num_frames // fps)
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
