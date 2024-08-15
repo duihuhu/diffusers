@@ -640,7 +640,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                 #     atten_cache = atten_cache
                 # )[0]
                 
-                res = self.transformer(
+                res, atten_cache = self.transformer(
                     hidden_states=latent_model_input,
                     encoder_hidden_states=prompt_embeds,
                     timestep=timestep,
@@ -648,8 +648,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     cur_step = current_step,
                     atten_cache = atten_cache
                 )
-                noise_pred = res[0][0]
-                atten_cache = res[1]
+                noise_pred = res[0]
                 
                 print("atten_cache[i]['atten'] ", atten_cache[0]['atten'])
                 noise_pred = noise_pred.float()
