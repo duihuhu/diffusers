@@ -129,12 +129,13 @@ class CogVideoXBlock(nn.Module):
             hidden_states=norm_hidden_states,
             encoder_hidden_states=None,
         )
-        if cur_step % 2 ==0:
-            atten_cache[cur_layer]['atten_cache'] = attn_output
-        else:
-            print("get step, block layer", cur_step, cur_layer)
-            attn_output = atten_cache[cur_layer]['atten_cache']
-            
+        # if cur_step % 2 ==0:
+        #     atten_cache[cur_layer]['atten_cache'] = attn_output
+        # else:
+        #     print("get step, block layer", cur_step, cur_layer)
+        #     attn_output = atten_cache[cur_layer]['atten_cache']
+        
+        print("cur step, block layer", cur_step, cur_layer)
         torch.cuda.synchronize()
         t3 = time.time()
         hidden_states = hidden_states + gate_msa * attn_output[:, text_length:]
@@ -347,7 +348,6 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     **ckpt_kwargs,
                 )
             else:
-                print("atten_cache cur_layer ", i, atten_cache[i])
                 hidden_states, encoder_hidden_states = block(
                     hidden_states=hidden_states,
                     encoder_hidden_states=encoder_hidden_states,
@@ -356,7 +356,6 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     cur_layer=i,
                     atten_cache=atten_cache,
                 )
-                print("atten_cache cur_layer  ", i, atten_cache[i])
         torch.cuda.synchronize()
         t5 = time.time()
 
