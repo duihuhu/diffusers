@@ -329,6 +329,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
 
         atten_cache = {}
         for i in range(self.num_layers):
+            atten_cache[-1][i] = {}
             atten_cache[-1][i]['atten_cache'] = -1
         # 5. Transformer blocks
         for i, block in enumerate(self.transformer_blocks):
