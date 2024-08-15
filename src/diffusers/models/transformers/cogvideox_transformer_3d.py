@@ -378,5 +378,5 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
 
         print("cogvideox transformer3d model ", t8-t7, t7-t6, t6-t5, t5-t4, t4-t3, t3-t2, t2-t1 )
         if not return_dict:
-            return (output,)
+            return (output,), atten_cache
         return Transformer2DModelOutput(sample=output), atten_cache
