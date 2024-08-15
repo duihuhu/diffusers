@@ -125,20 +125,25 @@ class CogVideoXBlock(nn.Module):
         # CogVideoX uses concatenated text + video embeddings with self-attention instead of using
         # them in cross-attention individually
         norm_hidden_states = torch.cat([norm_encoder_hidden_states, norm_hidden_states], dim=1)
-        if cur_step < 20:
-            if cur_step % 2 == 0:
-                attn_output = self.attn1(
-                    hidden_states=norm_hidden_states,
-                    encoder_hidden_states=None,
-                )
-                atten_cache[cur_layer]['atten'] = attn_output
-            else:
-                attn_output = atten_cache[cur_layer]['atten']
-        else:
-            attn_output = self.attn1(
-                hidden_states=norm_hidden_states,
-                encoder_hidden_states=None,
-            )
+        attn_output = self.attn1(
+            hidden_states=norm_hidden_states,
+            encoder_hidden_states=None,
+        )
+        
+        # if cur_step < 20:
+        #     if cur_step % 2 == 0:
+        #         attn_output = self.attn1(
+        #             hidden_states=norm_hidden_states,
+        #             encoder_hidden_states=None,
+        #         )
+        #         atten_cache[cur_layer]['atten'] = attn_output
+        #     else:
+        #         attn_output = atten_cache[cur_layer]['atten']
+        # else:
+        #     attn_output = self.attn1(
+        #         hidden_states=norm_hidden_states,
+        #         encoder_hidden_states=None,
+        #     )
         torch.cuda.synchronize()
         t3 = time.time()
         hidden_states = hidden_states + gate_msa * attn_output[:, text_length:]
