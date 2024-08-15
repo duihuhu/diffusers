@@ -112,7 +112,7 @@ class CogVideoXBlock(nn.Module):
         encoder_hidden_states: torch.Tensor,
         temb: torch.Tensor,
         step: int,
-        atten_cache: {},
+        atten_cache: dict,
     ) -> torch.Tensor:
         norm_hidden_states, norm_encoder_hidden_states, gate_msa, enc_gate_msa = self.norm1(
             hidden_states, encoder_hidden_states, temb
@@ -285,7 +285,6 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
 
         self.gradient_checkpointing = False
 
-        self.num_layers = num_layers
     def _set_gradient_checkpointing(self, module, value=False):
         self.gradient_checkpointing = value
 
@@ -296,6 +295,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         timestep: Union[int, float, torch.LongTensor],
         timestep_cond: Optional[torch.Tensor] = None,
         return_dict: bool = True,
+        atten_cache: dict = {},
     ):
         batch_size, num_frames, channels, height, width = hidden_states.shape
 
@@ -327,13 +327,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         hidden_states = hidden_states[:, self.config.max_text_seq_length :]
         torch.cuda.synchronize()
         t4 = time.time()
-
-        atten_cache = {}
-        atten_cache[-1] = {}
-
-        for i in range(self.num_layers):
-            atten_cache[-1][i] = {}
-            atten_cache[-1][i]['atten_cache'] = -1
+        
         # 5. Transformer blocks
         for i, block in enumerate(self.transformer_blocks):
             if self.training and self.gradient_checkpointing:

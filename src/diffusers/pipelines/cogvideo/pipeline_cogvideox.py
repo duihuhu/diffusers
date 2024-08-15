@@ -457,6 +457,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         ] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         max_sequence_length: int = 226,
+        atten_cache: dict = {},
     ) -> Union[CogVideoXPipelineOutput, Tuple]:
         """
         Function invoked when calling the pipeline for generation.
@@ -630,6 +631,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     encoder_hidden_states=prompt_embeds,
                     timestep=timestep,
                     return_dict=False,
+                    atten_cache=atten_cache
                 )[0]
                 noise_pred = noise_pred.float()
                 # perform guidance
