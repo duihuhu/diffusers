@@ -127,14 +127,14 @@ class CogVideoXBlock(nn.Module):
         # them in cross-attention individually
         norm_hidden_states = torch.cat([norm_encoder_hidden_states, norm_hidden_states], dim=1)
         print("step, block layer", step, self.layer)
-        if step %2 ==0:
-            attn_output = self.attn1(
-                hidden_states=norm_hidden_states,
-                encoder_hidden_states=None,
-            )
-            atten_cache[-1][self.layer]['atten_cache'] = attn_output
-        else:
-            attn_output = atten_cache[-1][self.layer]['atten_cache']
+        # if step %2 ==0:
+        attn_output = self.attn1(
+            hidden_states=norm_hidden_states,
+            encoder_hidden_states=None,
+        )
+        #     atten_cache[-1][self.layer]['atten_cache'] = attn_output
+        # else:
+        #     attn_output = atten_cache[-1][self.layer]['atten_cache']
         torch.cuda.synchronize()
         t3 = time.time()
         hidden_states = hidden_states + gate_msa * attn_output[:, text_length:]
