@@ -129,9 +129,9 @@ class CogVideoXBlock(nn.Module):
             hidden_states=norm_hidden_states,
             encoder_hidden_states=None,
         )
-        if cur_step % 2 ==0:
-            print("store cur_step cur_layer ",cur_step, cur_layer)
-            atten_cache = attn_output.clone()
+        if cur_step % 2 == 0:
+            atten_cache = attn_output
+            print("store cur_step cur_layer ",cur_step, cur_layer, atten_cache)
 
         # else:
         #     print("get step, block layer", cur_step, cur_layer)
