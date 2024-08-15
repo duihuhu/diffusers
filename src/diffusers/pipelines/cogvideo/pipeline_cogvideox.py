@@ -616,7 +616,7 @@ class CogVideoXPipeline(DiffusionPipeline):
 
         for i in range(30):
             atten_cache[i] = {}
-            atten_cache[i]['atten_cache'] = -1
+            atten_cache[i]['atten'] = -1
             
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             # for DPM-solver++
@@ -639,7 +639,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     cur_step = current_step,
                     atten_cache = atten_cache
                 )[0]
-                print("atten_cache ", atten_cache[i])
+                print("atten_cache ", atten_cache[current_step])
                 noise_pred = noise_pred.float()
                 current_step = current_step + 1
                 # perform guidance

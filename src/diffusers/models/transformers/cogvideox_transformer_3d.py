@@ -130,12 +130,11 @@ class CogVideoXBlock(nn.Module):
             encoder_hidden_states=None,
         )
         if cur_step % 2 ==0:
-            atten_cache[cur_layer]['atten_cache'] = attn_output
+            atten_cache[cur_layer]['atten'] = attn_output
         # else:
         #     print("get step, block layer", cur_step, cur_layer)
         #     attn_output = atten_cache[cur_layer]['atten_cache']
         
-        print("cur step, block layer", cur_step, cur_layer, id(atten_cache), id(atten_cache[cur_layer]))
         torch.cuda.synchronize()
         t3 = time.time()
         hidden_states = hidden_states + gate_msa * attn_output[:, text_length:]
