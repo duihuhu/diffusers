@@ -612,12 +612,12 @@ class CogVideoXPipeline(DiffusionPipeline):
         # 7. Denoising loop
         num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
         current_step = 0 
-        atten_cache = {}
+        # atten_cache = {}
 
-        for i in range(30):
-            atten_cache[i] = {}
-            atten_cache[i]['atten'] = -1
-            
+        # for i in range(30):
+        #     atten_cache[i] = {}
+        #     atten_cache[i]['atten'] = -1
+        atten_cache = None
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             # for DPM-solver++
             old_pred_original_sample = None
@@ -639,7 +639,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     cur_step = current_step,
                     atten_cache = atten_cache
                 )[0]
-                print("atten_cache ", atten_cache[0]['atten'])
+                print("atten_cache ", atten_cache)
                 noise_pred = noise_pred.float()
                 current_step = current_step + 1
                 # perform guidance
