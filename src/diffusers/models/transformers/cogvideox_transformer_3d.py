@@ -117,8 +117,8 @@ class CogVideoXBlock(nn.Module):
         t1 = time.time()
         # attention
         text_length = norm_encoder_hidden_states.size(1)
-        t2 = time.time()
         torch.cuda.synchronize()
+        t2 = time.time()
         # CogVideoX uses concatenated text + video embeddings with self-attention instead of using
         # them in cross-attention individually
         norm_hidden_states = torch.cat([norm_encoder_hidden_states, norm_hidden_states], dim=1)
@@ -126,8 +126,8 @@ class CogVideoXBlock(nn.Module):
             hidden_states=norm_hidden_states,
             encoder_hidden_states=None,
         )
-        t3 = time.time()
         torch.cuda.synchronize()
+        t3 = time.time()
         hidden_states = hidden_states + gate_msa * attn_output[:, text_length:]
         encoder_hidden_states = encoder_hidden_states + enc_gate_msa * attn_output[:, :text_length]
 
@@ -135,16 +135,16 @@ class CogVideoXBlock(nn.Module):
         norm_hidden_states, norm_encoder_hidden_states, gate_ff, enc_gate_ff = self.norm2(
             hidden_states, encoder_hidden_states, temb
         )
-        t4 = time.time()
         torch.cuda.synchronize()
+        t4 = time.time()
         # feed-forward
         norm_hidden_states = torch.cat([norm_encoder_hidden_states, norm_hidden_states], dim=1)
         ff_output = self.ff(norm_hidden_states)
 
         hidden_states = hidden_states + gate_ff * ff_output[:, text_length:]
         encoder_hidden_states = encoder_hidden_states + enc_gate_ff * ff_output[:, :text_length]
-        t5 = time.time()
         torch.cuda.synchronize()
+        t5 = time.time()
         print("cong video block ", t5-t4, t4-t3, t3-t2, t2-t1)
         return hidden_states, encoder_hidden_states
 
