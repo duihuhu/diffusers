@@ -631,14 +631,26 @@ class CogVideoXPipeline(DiffusionPipeline):
                 timestep = t.expand(latent_model_input.shape[0])
 
                 # predict noise model_output
-                noise_pred = self.transformer(
+                # noise_pred = self.transformer(
+                #     hidden_states=latent_model_input,
+                #     encoder_hidden_states=prompt_embeds,
+                #     timestep=timestep,
+                #     return_dict=False,
+                #     cur_step = current_step,
+                #     atten_cache = atten_cache
+                # )[0]
+                
+                res = self.transformer(
                     hidden_states=latent_model_input,
                     encoder_hidden_states=prompt_embeds,
                     timestep=timestep,
                     return_dict=False,
                     cur_step = current_step,
                     atten_cache = atten_cache
-                )[0]
+                )
+                noise_pred = res[0][0]
+                atten_cache = res[1]
+                
                 print("atten_cache[i]['atten'] ", atten_cache[0]['atten'])
                 noise_pred = noise_pred.float()
                 current_step = current_step + 1

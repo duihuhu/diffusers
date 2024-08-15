@@ -131,7 +131,6 @@ class CogVideoXBlock(nn.Module):
         )
         # if cur_step % 2 == 0:
         atten_cache[cur_layer]['atten'] = attn_output
-        print("store cur_step cur_layer ",cur_step, cur_layer, atten_cache[cur_layer]['atten'])
 
         # else:
         #     print("get step, block layer", cur_step, cur_layer)
@@ -157,7 +156,7 @@ class CogVideoXBlock(nn.Module):
         torch.cuda.synchronize()
         t5 = time.time()
         print("cong video block ", t5-t4, t4-t3, t3-t2, t2-t1)
-        return hidden_states, encoder_hidden_states
+        return hidden_states, encoder_hidden_states, atten_cache
 
 
 class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
@@ -349,7 +348,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
                     **ckpt_kwargs,
                 )
             else:
-                hidden_states, encoder_hidden_states = block(
+                hidden_states, encoder_hidden_states, atten_cache = block(
                     hidden_states=hidden_states,
                     encoder_hidden_states=encoder_hidden_states,
                     temb=emb,
@@ -380,4 +379,4 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         print("cogvideox transformer3d model ", t8-t7, t7-t6, t6-t5, t5-t4, t4-t3, t3-t2, t2-t1 )
         if not return_dict:
             return (output,)
-        return Transformer2DModelOutput(sample=output)
+        return Transformer2DModelOutput(sample=output), atten_cache
