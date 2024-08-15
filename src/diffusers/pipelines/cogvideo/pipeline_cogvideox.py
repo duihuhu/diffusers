@@ -617,7 +617,6 @@ class CogVideoXPipeline(DiffusionPipeline):
         # for i in range(30):
         #     atten_cache[i] = {}
         #     atten_cache[i]['atten'] = -1
-        atten_cache = None
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             # for DPM-solver++
             old_pred_original_sample = None
@@ -629,6 +628,7 @@ class CogVideoXPipeline(DiffusionPipeline):
 
                 # broadcast to batch dimension in a way that's compatible with ONNX/Core ML
                 timestep = t.expand(latent_model_input.shape[0])
+                atten_cache = None
 
                 # predict noise model_output
                 noise_pred = self.transformer(
