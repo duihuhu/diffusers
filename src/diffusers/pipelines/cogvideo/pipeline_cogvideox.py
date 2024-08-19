@@ -696,11 +696,11 @@ class CogVideoXPipeline(DiffusionPipeline):
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
         else:
             video = latents
-
+        end_time = time.time()
+        print("execute time " , end_time-med1_time, med1_time-med_time, med_time-start_time)
         # Offload all models
         self.maybe_free_model_hooks()
-        end_time = time.time()
-        print("execute time " , end_time-med1_time, med1_time-med1_time, med_time-start_time)
+
         if not return_dict:
             return (video,)
 
