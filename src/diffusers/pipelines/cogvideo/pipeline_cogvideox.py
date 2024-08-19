@@ -544,7 +544,8 @@ class CogVideoXPipeline(DiffusionPipeline):
         height = height or self.transformer.config.sample_size * self.vae_scale_factor_spatial
         width = width or self.transformer.config.sample_size * self.vae_scale_factor_spatial
         num_videos_per_prompt = 1
-
+        import time
+        start_time = time.time()
         # 1. Check inputs. Raise error if not correct
         self.check_inputs(
             prompt,
@@ -611,6 +612,7 @@ class CogVideoXPipeline(DiffusionPipeline):
 
         # 7. Denoising loop
         num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
+        med_time = time.time()
         current_step = 0 
         atten_cache = {}
 
@@ -688,7 +690,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                     negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
                     progress_bar.update()
-                    
+        med1_time = time.time()     
         if not output_type == "latent":
             video = self.decode_latents(latents, num_frames // fps)
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
@@ -697,7 +699,8 @@ class CogVideoXPipeline(DiffusionPipeline):
 
         # Offload all models
         self.maybe_free_model_hooks()
-
+        end_time = time.time()
+        print("execute time " , end_time-med1_time, med1_time-med1_time, med_time-start_time)
         if not return_dict:
             return (video,)
 

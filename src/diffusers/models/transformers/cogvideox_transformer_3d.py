@@ -163,7 +163,7 @@ class CogVideoXBlock(nn.Module):
         encoder_hidden_states = encoder_hidden_states + enc_gate_ff * ff_output[:, :text_length]
         torch.cuda.synchronize()
         t5 = time.time()
-        # print("cong video block ", t5-t4, t4-t3, t3-t2, t2-t1)
+        print("cong video block ", t5-t4, t4-t3, t3-t2, t2-t1)
         return hidden_states, encoder_hidden_states, atten_cache
 
 
