@@ -953,7 +953,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
                         callback(step_idx, t, latents)
         torch.cuda.synchronize() 
         t3 = time.time()
-        time.sleep(3)
+        time.sleep(1)
         if not output_type == "latent":
             image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
             if use_resolution_binning:
