@@ -809,6 +809,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
             orig_height, orig_width = height, width
             height, width = self.image_processor.classify_height_width_bin(height, width, ratios=aspect_ratio_bin)
 
+        t2 = time.time()
         self.check_inputs(
             prompt,
             height,
@@ -835,6 +836,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
         # of the Imagen paper: https://arxiv.org/pdf/2205.11487.pdf . `guidance_scale = 1`
         # corresponds to doing no classifier free guidance.
         do_classifier_free_guidance = guidance_scale > 1.0
+        t3 = time.time()
 
         # 3. Encode input prompt
         (
@@ -858,11 +860,13 @@ class PixArtAlphaPipeline(DiffusionPipeline):
         if do_classifier_free_guidance:
             prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
             prompt_attention_mask = torch.cat([negative_prompt_attention_mask, prompt_attention_mask], dim=0)
+        t4 = time.time()
 
         # 4. Prepare timesteps
         timesteps, num_inference_steps = retrieve_timesteps(
             self.scheduler, num_inference_steps, device, timesteps, sigmas
         )
+        t5 = time.time()
 
         # 5. Prepare latents.
         latent_channels = self.transformer.config.in_channels
@@ -876,9 +880,11 @@ class PixArtAlphaPipeline(DiffusionPipeline):
             generator,
             latents,
         )
+        t6 = time.time()
 
         # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
+        t7 = time.time()
 
         # 6.1 Prepare micro-conditions.
         added_cond_kwargs = {"resolution": None, "aspect_ratio": None}
@@ -896,7 +902,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
 
         # 7. Denoising loop
         num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
-        t2 = time.time()
+        t8 = time.time()
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
@@ -952,7 +958,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
                         step_idx = i // getattr(self.scheduler, "order", 1)
                         callback(step_idx, t, latents)
         torch.cuda.synchronize() 
-        t3 = time.time()
+        t9 = time.time()
 
         if not output_type == "latent":
             image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
@@ -963,10 +969,10 @@ class PixArtAlphaPipeline(DiffusionPipeline):
 
         if not output_type == "latent":
             image = self.image_processor.postprocess(image, output_type=output_type)
-        t4 = time.time()
+        t10 = time.time()
         # Offload all models
         self.maybe_free_model_hooks()
-        print("execute time ", t4-t3, t3-t2, t2-t1)
+        print("execute time ", t10-t9, t9-t8, t8-t7, t7-t6, t6-t5, t5-t4, t4-t3, t3-t2, t2-t1)
         if not return_dict:
             return (image,)
 
