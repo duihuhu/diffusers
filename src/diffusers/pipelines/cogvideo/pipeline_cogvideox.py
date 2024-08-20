@@ -696,7 +696,10 @@ class CogVideoXPipeline(DiffusionPipeline):
         med1_time = time.time()     
         if not output_type == "latent":
             video = self.decode_latents(latents, num_frames // fps)
+            ta = time.time()
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
+            tb = time.time()
+            print("postprocess_video ", tb-ta)
         else:
             video = latents
         end_time = time.time()
