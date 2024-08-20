@@ -695,12 +695,14 @@ class CogVideoXPipeline(DiffusionPipeline):
         if not output_type == "latent":
             print("num_frames, fps ", num_frames, fps)
             video = self.decode_latents(latents, num_frames // fps)
+            torch.cuda.synchronize()
+            t4 = time.time()     
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
+            torch.cuda.synchronize()
+            t5 = time.time()
+            print("execute time " , t2-t1, t3-t2, t4-t3, t5-t4)
         else:
             video = latents
-        torch.cuda.synchronize()
-        t4 = time.time()
-        print("execute time " , t2-t1, t3-t2, t4-t3)
         # Offload all models
         self.maybe_free_model_hooks()
 
