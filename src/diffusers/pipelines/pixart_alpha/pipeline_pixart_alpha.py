@@ -956,6 +956,8 @@ class PixArtAlphaPipeline(DiffusionPipeline):
         time.sleep(1)
         if not output_type == "latent":
             image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
+            t4 = time.time()
+            print("decode time ", t4-t3)
             if use_resolution_binning:
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
         else:
@@ -963,10 +965,10 @@ class PixArtAlphaPipeline(DiffusionPipeline):
 
         if not output_type == "latent":
             image = self.image_processor.postprocess(image, output_type=output_type)
-        t4 = time.time()
+
         # Offload all models
         self.maybe_free_model_hooks()
-        print("execute time ", t4-t3, t3-t2, t2-t1)
+        # print("execute time ", t4-t3, t3-t2, t2-t1)
         if not return_dict:
             return (image,)
 
