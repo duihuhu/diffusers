@@ -335,17 +335,13 @@ class CogVideoXPipeline(DiffusionPipeline):
     def decode_latents(self, latents: torch.Tensor, num_seconds: int):
         latents = latents.permute(0, 2, 1, 3, 4)  # [batch_size, num_channels, num_frames, height, width]
         latents = 1 / self.vae.config.scaling_factor * latents
-        import time
         frames = []
-        t1 = time.time()
         for i in range(num_seconds):
             start_frame, end_frame = (0, 3) if i == 0 else (2 * i + 1, 2 * i + 3)
 
             current_frames = self.vae.decode(latents[:, :, start_frame:end_frame]).sample
             frames.append(current_frames)
-        torch.cuda.synchronize()
-        t2 = time.time()
-        print("decode_latents ", t2-t1)
+
         self.vae.clear_fake_context_parallel_cache()
 
         frames = torch.cat(frames, dim=2)
@@ -548,7 +544,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         width = width or self.transformer.config.sample_size * self.vae_scale_factor_spatial
         num_videos_per_prompt = 1
         import time
-        start_time = time.time()
+        t1 = time.time()
         # 1. Check inputs. Raise error if not correct
         self.check_inputs(
             prompt,
@@ -622,7 +618,8 @@ class CogVideoXPipeline(DiffusionPipeline):
         for i in range(30):
             atten_cache[i] = {}
             atten_cache[i]['atten'] = -1
-            
+        torch.cuda.synchronize()
+        t2 = time.time()
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             # for DPM-solver++
             old_pred_original_sample = None
@@ -693,20 +690,16 @@ class CogVideoXPipeline(DiffusionPipeline):
                     negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
                     progress_bar.update()
-        med1_time = time.time()     
+        torch.cuda.synchronize()
+        t3 = time.time()     
         if not output_type == "latent":
             video = self.decode_latents(latents, num_frames // fps)
-            ta = time.time()
-            print("output_type ", output_type)
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
-            
-            torch.cuda.synchronize()
-            tb = time.time()
-            print("postprocess_video ", tb-ta)
         else:
             video = latents
-        end_time = time.time()
-        print("execute time " , end_time-med1_time, med1_time-med_time, med_time-start_time)
+        torch.cuda.synchronize()
+        t4 = time.time()
+        print("execute time " , t4-t3, t3-t2, t2-t1)
         # Offload all models
         self.maybe_free_model_hooks()
 
