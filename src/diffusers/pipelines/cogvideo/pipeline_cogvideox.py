@@ -343,6 +343,7 @@ class CogVideoXPipeline(DiffusionPipeline):
 
             current_frames = self.vae.decode(latents[:, :, start_frame:end_frame]).sample
             frames.append(current_frames)
+        torch.cuda.synchronize()
         t2 = time.time()
         print("decode_latents ", t2-t1)
         self.vae.clear_fake_context_parallel_cache()
