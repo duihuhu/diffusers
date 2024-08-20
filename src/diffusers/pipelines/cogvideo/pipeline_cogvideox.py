@@ -699,7 +699,7 @@ class CogVideoXPipeline(DiffusionPipeline):
             video = latents
         torch.cuda.synchronize()
         t4 = time.time()
-        print("execute time " , t4-t3, t3-t2, t2-t1)
+        print("execute time " , t2-t1, t3-t2, t4-t3)
         # Offload all models
         self.maybe_free_model_hooks()
 
