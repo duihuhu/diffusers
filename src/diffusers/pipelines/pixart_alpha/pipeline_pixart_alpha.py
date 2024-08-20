@@ -966,9 +966,10 @@ class PixArtAlphaPipeline(DiffusionPipeline):
         if not output_type == "latent":
             image = self.image_processor.postprocess(image, output_type=output_type)
 
+        t5=time.time()
         # Offload all models
         self.maybe_free_model_hooks()
-        # print("execute time ", t4-t3, t3-t2, t2-t1)
+        print("execute time ", t5-t3, t3-t2, t2-t1)
         if not return_dict:
             return (image,)
 
