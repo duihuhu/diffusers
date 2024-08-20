@@ -630,8 +630,7 @@ class VaeImageProcessor(ConfigMixin):
 
         if output_type == "latent":
             return image
-        import time
-        t1 = time.time()
+
         if do_denormalize is None:
             do_denormalize = [self.config.do_normalize] * image.shape[0]
 
@@ -643,14 +642,17 @@ class VaeImageProcessor(ConfigMixin):
             return image
 
         image = self.pt_to_numpy(image)
-        t2 = time.time()
-        print("pt_to_numpy ", t2-t1)
+
         if output_type == "np":
             return image
 
         if output_type == "pil":
-            return self.numpy_to_pil(image)
-
+            import time
+            t1 = time.time()
+            res =  self.numpy_to_pil(image)
+            t2 = time.time()
+            print("pt_to_numpy ", t2-t1)
+            return res
     def apply_overlay(
         self,
         mask: PIL.Image.Image,
