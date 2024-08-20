@@ -438,7 +438,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         height: int = 480,
         width: int = 720,
         num_frames: int = 16,
-        fps: int = 8,
+        fps: int = 4,
         num_inference_steps: int = 50,
         timesteps: Optional[List[int]] = None,
         guidance_scale: float = 6,
