@@ -437,7 +437,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         negative_prompt: Optional[Union[str, List[str]]] = None,
         height: int = 480,
         width: int = 720,
-        num_frames: int = 24,
+        num_frames: int = 16,
         fps: int = 8,
         num_inference_steps: int = 50,
         timesteps: Optional[List[int]] = None,
