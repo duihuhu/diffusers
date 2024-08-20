@@ -697,6 +697,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         if not output_type == "latent":
             video = self.decode_latents(latents, num_frames // fps)
             ta = time.time()
+            print("output_type ", output_type)
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
             
             torch.cuda.synchronize()
