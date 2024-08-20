@@ -960,6 +960,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
         else:
             image = latents
+        torch.cuda.synchronize() 
         t4 = time.time()
             # print("decode time ", t4-t3)
         if not output_type == "latent":
@@ -968,7 +969,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
         t5=time.time()
         # Offload all models
         self.maybe_free_model_hooks()
-        print("execute time ", t5-t4, t4-t3, t3-t2, t2-t1)
+        print("execute time ", t2-t1, t3-t2, t4-t3, t5-t4)
         if not return_dict:
             return (image,)
 

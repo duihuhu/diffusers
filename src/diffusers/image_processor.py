@@ -647,11 +647,7 @@ class VaeImageProcessor(ConfigMixin):
             return image
 
         if output_type == "pil":
-            import time
-            t1 = time.time()
             res =  self.numpy_to_pil(image)
-            t2 = time.time()
-            print("pt_to_numpy ", t2-t1)
             return res
     def apply_overlay(
         self,
