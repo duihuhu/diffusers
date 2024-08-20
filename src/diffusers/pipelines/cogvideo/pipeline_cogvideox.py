@@ -698,6 +698,7 @@ class CogVideoXPipeline(DiffusionPipeline):
             video = self.decode_latents(latents, num_frames // fps)
             ta = time.time()
             video = self.video_processor.postprocess_video(video=video, output_type=output_type)
+            torch.cuda.synchronize()
             tb = time.time()
             print("postprocess_video ", tb-ta)
         else:
