@@ -630,7 +630,8 @@ class VaeImageProcessor(ConfigMixin):
 
         if output_type == "latent":
             return image
-
+        import time
+        t1 = time.time()
         if do_denormalize is None:
             do_denormalize = [self.config.do_normalize] * image.shape[0]
 
@@ -640,8 +641,7 @@ class VaeImageProcessor(ConfigMixin):
 
         if output_type == "pt":
             return image
-        import time
-        t1 = time.time()
+
         image = self.pt_to_numpy(image)
         t2 = time.time()
         print("pt_to_numpy ", t2-t1)
