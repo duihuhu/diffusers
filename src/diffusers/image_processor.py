@@ -640,9 +640,11 @@ class VaeImageProcessor(ConfigMixin):
 
         if output_type == "pt":
             return image
-
+        import time
+        t1 = time.time()
         image = self.pt_to_numpy(image)
-
+        t2 = time.time()
+        print("pt_to_numpy ", t2-t1)
         if output_type == "np":
             return image
 
