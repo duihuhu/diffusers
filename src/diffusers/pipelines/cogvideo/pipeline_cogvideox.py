@@ -534,7 +534,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         """
 
         assert (
-            num_frames <= 48 and num_frames % fps == 0 and fps == 8
+            num_frames <= 48 and num_frames % fps == 0
         ), f"The number of frames must be divisible by {fps=} and less than 48 frames (for now). Other values are not supported in CogVideoX."
 
         if isinstance(callback_on_step_end, (PipelineCallback, MultiPipelineCallbacks)):
