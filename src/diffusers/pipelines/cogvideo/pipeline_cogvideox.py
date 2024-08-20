@@ -437,8 +437,8 @@ class CogVideoXPipeline(DiffusionPipeline):
         negative_prompt: Optional[Union[str, List[str]]] = None,
         height: int = 480,
         width: int = 720,
-        num_frames: int = 16,
-        fps: int = 4,
+        num_frames: int = 48,
+        fps: int = 8,
         num_inference_steps: int = 50,
         timesteps: Optional[List[int]] = None,
         guidance_scale: float = 6,
@@ -534,7 +534,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         """
 
         assert (
-            num_frames <= 48 and num_frames % fps == 0
+            num_frames <= 48 and num_frames % fps == 0 and fps == 8
         ), f"The number of frames must be divisible by {fps=} and less than 48 frames (for now). Other values are not supported in CogVideoX."
 
         if isinstance(callback_on_step_end, (PipelineCallback, MultiPipelineCallbacks)):
