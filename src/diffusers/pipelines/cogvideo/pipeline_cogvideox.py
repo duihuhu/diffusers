@@ -624,6 +624,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             # for DPM-solver++
             old_pred_original_sample = None
+            print("timesteps ", timesteps)
             for i, t in enumerate(timesteps):
                 if self.interrupt:
                     continue
