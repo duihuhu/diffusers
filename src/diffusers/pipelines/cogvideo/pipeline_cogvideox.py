@@ -645,7 +645,6 @@ class CogVideoXPipeline(DiffusionPipeline):
                 #     atten_cache = atten_cache
                 # )[0]
                 print("latent_model_input hidden_states ", latent_model_input.shape)
-                print("timestep ", timestep.shape)
                 res, atten_cache = self.transformer(
                     hidden_states=latent_model_input,
                     encoder_hidden_states=prompt_embeds,
