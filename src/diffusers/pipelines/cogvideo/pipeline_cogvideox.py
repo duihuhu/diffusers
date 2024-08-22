@@ -333,7 +333,6 @@ class CogVideoXPipeline(DiffusionPipeline):
         return latents
 
     def decode_latents(self, latents: torch.Tensor, num_seconds: int):
-        print("decode_latents latents ", latents.shape)
         latents = latents.permute(0, 2, 1, 3, 4)  # [batch_size, num_channels, num_frames, height, width]
         latents = 1 / self.vae.config.scaling_factor * latents
         frames = []
@@ -587,6 +586,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         )
         if do_classifier_free_guidance:
             prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
+        print("prepare prompt_embeds ", prompt_embeds.shape)
 
         # 4. Prepare timesteps
         timesteps, num_inference_steps = retrieve_timesteps(self.scheduler, num_inference_steps, device, timesteps)
@@ -607,6 +607,7 @@ class CogVideoXPipeline(DiffusionPipeline):
             latents,
         )
 
+        print("prepare latents ", latents.shape)
         # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
 
@@ -624,7 +625,6 @@ class CogVideoXPipeline(DiffusionPipeline):
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             # for DPM-solver++
             old_pred_original_sample = None
-            print("timesteps ", timesteps)
             for i, t in enumerate(timesteps):
                 if self.interrupt:
                     continue
@@ -643,7 +643,7 @@ class CogVideoXPipeline(DiffusionPipeline):
                 #     cur_step = current_step,
                 #     atten_cache = atten_cache
                 # )[0]
-                
+                print("latent_model_input hidden_states ", latent_model_input.shape)
                 res, atten_cache = self.transformer(
                     hidden_states=latent_model_input,
                     encoder_hidden_states=prompt_embeds,
