@@ -314,7 +314,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
     ):
         batch_size, num_frames, channels, height, width = hidden_states.shape
         print("batch_size, num_frames, channels, height, width ", batch_size, num_frames, channels, height, width)
-        import time
+        # import time
         # t1 = time.time()
         # 1. Time embedding
         timesteps = timestep

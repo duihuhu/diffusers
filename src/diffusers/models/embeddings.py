@@ -362,8 +362,11 @@ class CogVideoXPatchEmbed(nn.Module):
         text_embeds = self.text_proj(text_embeds)
 
         batch, num_frames, channels, height, width = image_embeds.shape
+        print("image_embeds reshape before ", image_embeds.shape)
         image_embeds = image_embeds.reshape(-1, channels, height, width)
+        print("image_embeds reshape ", image_embeds.shape)
         image_embeds = self.proj(image_embeds)
+        print("image_embeds proj ", image_embeds.shape)
         image_embeds = image_embeds.view(batch, num_frames, *image_embeds.shape[1:])
         image_embeds = image_embeds.flatten(3).transpose(2, 3)  # [batch, num_frames, height x width, channels]
         image_embeds = image_embeds.flatten(1, 2)  # [batch, num_frames x height x width, channels]
