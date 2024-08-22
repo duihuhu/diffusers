@@ -584,6 +584,7 @@ class CogVideoXPipeline(DiffusionPipeline):
             max_sequence_length=max_sequence_length,
             device=device,
         )
+        print("encode_prompt prepare prompt_embeds ", prompt_embeds.shape)
         if do_classifier_free_guidance:
             prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
         print("prepare prompt_embeds ", prompt_embeds.shape)
