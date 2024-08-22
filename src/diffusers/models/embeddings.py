@@ -368,8 +368,11 @@ class CogVideoXPatchEmbed(nn.Module):
         image_embeds = self.proj(image_embeds)
         print("image_embeds proj ", image_embeds.shape)
         image_embeds = image_embeds.view(batch, num_frames, *image_embeds.shape[1:])
+        print("image_embeds proj view ", image_embeds.shape)
         image_embeds = image_embeds.flatten(3).transpose(2, 3)  # [batch, num_frames, height x width, channels]
+        print("image_embeds proj flatten ", image_embeds.shape)
         image_embeds = image_embeds.flatten(1, 2)  # [batch, num_frames x height x width, channels]
+        print("image_embeds proj flatten flatten ", image_embeds.shape)
 
         embeds = torch.cat(
             [text_embeds, image_embeds], dim=1
