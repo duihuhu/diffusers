@@ -2194,7 +2194,7 @@ class AttnProcessor2_0:
         elif attn.norm_cross:
             encoder_hidden_states = attn.norm_encoder_hidden_states(encoder_hidden_states)
         
-        print("attent encoder_hidden_states ", encoder_hidden_states.shape)
+        print("attent encoder_hidden_states ", encoder_hidden_states.shape, attn.cross_attention_dim, attn.query_dim)
         key = attn.to_k(encoder_hidden_states)
         value = attn.to_v(encoder_hidden_states)
         print("attent key ", key.shape)
