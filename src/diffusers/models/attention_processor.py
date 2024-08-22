@@ -749,27 +749,19 @@ class AttnProcessor:
 
         if attn.group_norm is not None:
             hidden_states = attn.group_norm(hidden_states.transpose(1, 2)).transpose(1, 2)
-        print("attn processor hidden_states ", hidden_states.shape)
         query = attn.to_q(hidden_states)
-        print("attn processor query ", query.shape)
 
         if encoder_hidden_states is None:
             encoder_hidden_states = hidden_states
         elif attn.norm_cross:
             encoder_hidden_states = attn.norm_encoder_hidden_states(encoder_hidden_states)
-        print("attn processor encoder_hidden_states ", encoder_hidden_states.shape)
 
         key = attn.to_k(encoder_hidden_states)
         value = attn.to_v(encoder_hidden_states)
-        print("attn processor key ", key.shape)
-        print("attn processor value ", value.shape)
 
         query = attn.head_to_batch_dim(query)
         key = attn.head_to_batch_dim(key)
         value = attn.head_to_batch_dim(value)
-        print("head_to_batch_dim processor query ", key.shape)
-        print("head_to_batch_dim processor key ", key.shape)
-        print("head_to_batch_dim processor value ", value.shape)
         
         attention_probs = attn.get_attention_scores(query, key, attention_mask)
         hidden_states = torch.bmm(attention_probs, value)
@@ -2171,7 +2163,6 @@ class AttnProcessor2_0:
         if len(args) > 0 or kwargs.get("scale", None) is not None:
             deprecation_message = "The `scale` argument is deprecated and will be ignored. Please remove it, as passing it will raise an error in the future. `scale` should directly be passed while calling the underlying pipeline component i.e., via `cross_attention_kwargs`."
             deprecate("scale", "1.0.0", deprecation_message)
-        print("attent 2 ")
         residual = hidden_states
         if attn.spatial_norm is not None:
             hidden_states = attn.spatial_norm(hidden_states, temb)
@@ -2194,16 +2185,20 @@ class AttnProcessor2_0:
 
         if attn.group_norm is not None:
             hidden_states = attn.group_norm(hidden_states.transpose(1, 2)).transpose(1, 2)
-
+        print("attent hidden_states ", hidden_states.shape)
         query = attn.to_q(hidden_states)
+        print("attent query ", query.shape)
 
         if encoder_hidden_states is None:
             encoder_hidden_states = hidden_states
         elif attn.norm_cross:
             encoder_hidden_states = attn.norm_encoder_hidden_states(encoder_hidden_states)
-
+        
+        print("attent encoder_hidden_states ", encoder_hidden_states.shape)
         key = attn.to_k(encoder_hidden_states)
         value = attn.to_v(encoder_hidden_states)
+        print("attent key ", key.shape)
+        print("attent value ", value.shape)
 
         inner_dim = key.shape[-1]
         head_dim = inner_dim // attn.heads
@@ -2212,6 +2207,9 @@ class AttnProcessor2_0:
 
         key = key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
         value = value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
+        print("view query ", query.shape)
+        print("view key ", key.shape)
+        print("view value ", value.shape)
 
         if attn.norm_q is not None:
             query = attn.norm_q(query)
