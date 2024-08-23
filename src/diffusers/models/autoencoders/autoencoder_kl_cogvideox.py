@@ -568,11 +568,11 @@ class CogVideoXUpBlock3D(nn.Module):
                 )
             else:
                 hidden_states = resnet(hidden_states, temb, zq)
-        print("up block forward ", hidden_states.shape)
+        # print("up block forward ", hidden_states.shape)
         if self.upsamplers is not None:
             for upsampler in self.upsamplers:
                 hidden_states = upsampler(hidden_states)
-        print("up upsamplers forward ", hidden_states.shape)
+        # print("up upsamplers forward ", hidden_states.shape)
 
         return hidden_states
 
