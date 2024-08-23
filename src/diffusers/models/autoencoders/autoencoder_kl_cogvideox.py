@@ -1014,7 +1014,10 @@ class AutoencoderKLCogVideoX(ModelMixin, ConfigMixin, FromOriginalModelMixin):
         """
         if self.post_quant_conv is not None:
             z = self.post_quant_conv(z)
+        print("decode z shape ", z.shape)
         dec = self.decoder(z)
+        print("decode dec shape ", dec.shape)
+
         if not return_dict:
             return (dec,)
         return DecoderOutput(sample=dec)
