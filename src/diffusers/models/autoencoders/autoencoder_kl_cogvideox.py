@@ -126,8 +126,8 @@ class CogVideoXCausalConv3d(nn.Module):
         inputs = inputs.transpose(0, dim)
 
         if self.conv_cache is not None:
-            inputs = torch.cat([self.conv_cache.transpose(0, dim).to(inputs.device), inputs], dim=0)
             # inputs = torch.cat([self.conv_cache.transpose(0, dim).to(inputs.device), inputs], dim=0)
+            inputs = torch.cat([self.conv_cache.transpose(0, dim).to(inputs.device), inputs], dim=0)
 
         else:
             inputs = torch.cat([inputs[:1]] * (kernel_size - 1) + [inputs], dim=0)
@@ -143,8 +143,8 @@ class CogVideoXCausalConv3d(nn.Module):
         input_parallel = self.fake_context_parallel_forward(inputs)
 
         self._clear_fake_context_parallel_cache()
-        self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone().cpu()
-        # self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone()
+        # self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone().cpu()
+        self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone()
 
         padding_2d = (self.width_pad, self.width_pad, self.height_pad, self.height_pad)
         input_parallel = F.pad(input_parallel, padding_2d, mode="constant", value=0)
