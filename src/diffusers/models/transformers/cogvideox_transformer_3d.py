@@ -313,7 +313,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         atten_cache = {},
     ):
         batch_size, num_frames, channels, height, width = hidden_states.shape
-        print("batch_size, num_frames, channels, height, width ", batch_size, num_frames, channels, height, width)
+        # print("batch_size, num_frames, channels, height, width ", batch_size, num_frames, channels, height, width)
         # import time
         # t1 = time.time()
         # 1. Time embedding
@@ -329,7 +329,7 @@ class CogVideoXTransformer3DModel(ModelMixin, ConfigMixin):
         # t2 = time.time()
         # 2. Patch embedding
         hidden_states = self.patch_embed(encoder_hidden_states, hidden_states)
-        print("patch_embed hidden_states ", hidden_states.shape)
+        # print("patch_embed hidden_states ", hidden_states.shape)
         # torch.cuda.synchronize()
         # t3 = time.time()
         # 3. Position embedding
