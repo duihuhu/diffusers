@@ -338,7 +338,7 @@ class CogVideoXPipeline(DiffusionPipeline):
         frames = []
         for i in range(5):
             start_frame, end_frame = (0, 3) if i == 0 else (2 * i + 1, 2 * i + 3)
-            print("start_frame, end_frame ", start_frame, end_frame)
+            # print("start_frame, end_frame ", start_frame, end_frame)
             current_frames = self.vae.decode(latents[:, :, start_frame:end_frame]).sample
             frames.append(current_frames)
 

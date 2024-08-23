@@ -822,7 +822,7 @@ class CogVideoXDecoder3D(nn.Module):
     def forward(self, sample: torch.Tensor, temb: Optional[torch.Tensor] = None) -> torch.Tensor:
         r"""The forward method of the `CogVideoXDecoder3D` class."""
         hidden_states = self.conv_in(sample)
-        print("decode hidden state ", hidden_states.shape)
+        # print("decode hidden state ", hidden_states.shape)
         if self.training and self.gradient_checkpointing:
 
             def create_custom_forward(module):
@@ -844,12 +844,12 @@ class CogVideoXDecoder3D(nn.Module):
         else:
             # 1. Mid
             hidden_states = self.mid_block(hidden_states, temb, sample)
-            print("Mid decode hidden state ", hidden_states.shape)
+            # print("Mid decode hidden state ", hidden_states.shape)
 
             # 2. Up
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
-            print("up_block decode hidden state ", hidden_states.shape)
+            # print("up_block decode hidden state ", hidden_states.shape)
 
         # 3. Post-process
         hidden_states = self.norm_out(hidden_states, sample)
@@ -1017,9 +1017,9 @@ class AutoencoderKLCogVideoX(ModelMixin, ConfigMixin, FromOriginalModelMixin):
         """
         if self.post_quant_conv is not None:
             z = self.post_quant_conv(z)
-        print("decode z shape ", z.shape)
+        # print("decode z shape ", z.shape)
         dec = self.decoder(z)
-        print("decode dec shape ", dec.shape)
+        # print("decode dec shape ", dec.shape)
 
         if not return_dict:
             return (dec,)
