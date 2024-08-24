@@ -107,7 +107,6 @@ class CogVideoXCausalConv3d(nn.Module):
 
         stride = (stride, 1, 1)
         dilation = (dilation, 1, 1)
-        print("kernel_size ", kernel_size)
         self.conv = CogVideoXSafeConv3d(
             in_channels=in_channels,
             out_channels=out_channels,
@@ -287,10 +286,8 @@ class CogVideoXResnetBlock3D(nn.Module):
             hidden_states = self.norm1(hidden_states)
 
         hidden_states = self.nonlinearity(hidden_states)
-        print("before hidden_states size conv1 ", hidden_states.shape)
         hidden_states = self.conv1(hidden_states)
-        print("hidden_states size conv1 ", hidden_states.shape)
-
+        
         if temb is not None:
             hidden_states = hidden_states + self.temb_proj(self.nonlinearity(temb))[:, :, None, None, None]
 
@@ -476,7 +473,9 @@ class CogVideoXMidBlock3D(nn.Module):
                     create_custom_forward(resnet), hidden_states, temb, zq
                 )
             else:
+                print("before hidden states ", hidden_states.shape)
                 hidden_states = resnet(hidden_states, temb, zq)
+                print("after hidden states ", hidden_states.shape)
 
         return hidden_states
 
@@ -846,13 +845,15 @@ class CogVideoXDecoder3D(nn.Module):
                 )
         else:
             # 1. Mid
+            print("before Mid decode hidden state ", hidden_states.shape)
             hidden_states = self.mid_block(hidden_states, temb, sample)
-            # print("Mid decode hidden state ", hidden_states.shape)
+            print("Mid decode hidden state ", hidden_states.shape)
 
             # 2. Up
+            print("before up_block decode hidden state ", hidden_states.shape)
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
-            # print("up_block decode hidden state ", hidden_states.shape)
+            print("up_block decode hidden state ", hidden_states.shape)
 
         # 3. Post-process
         hidden_states = self.norm_out(hidden_states, sample)
