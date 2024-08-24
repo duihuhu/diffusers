@@ -460,6 +460,7 @@ class CogVideoXMidBlock3D(nn.Module):
         temb: Optional[torch.Tensor] = None,
         zq: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
+        print("len ", len(self.resnets))
         for resnet in self.resnets:
             if self.training and self.gradient_checkpointing:
 
@@ -850,10 +851,10 @@ class CogVideoXDecoder3D(nn.Module):
             print("after Mid decode hidden state ", hidden_states.shape)
 
             # 2. Up
-            print("before up_block decode hidden state ", hidden_states.shape)
+            # print("before up_block decode hidden state ", hidden_states.shape)
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
-            print("after up_block decode hidden state ", hidden_states.shape)
+            # print("after up_block decode hidden state ", hidden_states.shape)
 
         # 3. Post-process
         hidden_states = self.norm_out(hidden_states, sample)
