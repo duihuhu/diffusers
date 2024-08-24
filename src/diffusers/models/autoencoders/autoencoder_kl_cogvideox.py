@@ -576,7 +576,7 @@ class CogVideoXUpBlock3D(nn.Module):
         r"""Forward method of the `CogVideoXUpBlock3D` class."""
         import time
         t1 = time.time()
-        print("up blocks 1 hidden_states ", hidden_states.shape)
+        print("up blocks 1 hidden_states ", hidden_states.shape, zq.shape)
         for resnet in self.resnets:
             if self.training and self.gradient_checkpointing:
 
@@ -880,7 +880,7 @@ class CogVideoXDecoder3D(nn.Module):
             # print("before up_block decode hidden state ", hidden_states.shape)
             print("len up_block" , len(self.up_blocks))
             for up_block in self.up_blocks:
-                print("up block start ", hidden_states.shape)
+                print("up block start ", hidden_states.shape, sample.shape)
                 hidden_states = up_block(hidden_states, temb, sample)
                 print("up block start end ", hidden_states.shape)
             # print("after up_block decode hidden state ", hidden_states.shape)
