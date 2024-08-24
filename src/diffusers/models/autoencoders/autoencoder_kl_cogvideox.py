@@ -280,11 +280,10 @@ class CogVideoXResnetBlock3D(nn.Module):
         import time
         t1 = time.time()
         hidden_states = inputs
-        print("reset hidden_states1 ", hidden_states.shape)
+        print("reset hidden_states1 ", hidden_states.shape, zq.shape)
         if zq is not None:
             hidden_states = self.norm1(hidden_states, zq)
         else:
-            print("zq is None")
             hidden_states = self.norm1(hidden_states)
         print("reset hidden_states2 ", hidden_states.shape)
 
