@@ -555,6 +555,7 @@ class CogVideoXUpBlock3D(nn.Module):
         r"""Forward method of the `CogVideoXUpBlock3D` class."""
         import time
         t1 = time.time()
+        print("up blocks 1 hidden_states ", hidden_states.shape)
         for resnet in self.resnets:
             if self.training and self.gradient_checkpointing:
 
@@ -569,13 +570,14 @@ class CogVideoXUpBlock3D(nn.Module):
                 )
             else:
                 hidden_states = resnet(hidden_states, temb, zq)
+        print("up blocks 2 hidden_states ", hidden_states.shape)
         torch.cuda.synchronize()
         t2 = time.time()
         # print("up block forward ", hidden_states.shape)
         if self.upsamplers is not None:
             for upsampler in self.upsamplers:
                 hidden_states = upsampler(hidden_states)
-        # print("up upsamplers forward ", hidden_states.shape)
+        print("up blocks 3 hidden_states ", hidden_states.shape)
         torch.cuda.synchronize()
         t3 = time.time()
         print("up blocks time ", t3-t2, t2-t1)
