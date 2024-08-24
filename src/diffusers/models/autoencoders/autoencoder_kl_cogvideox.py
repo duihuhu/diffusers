@@ -284,6 +284,7 @@ class CogVideoXResnetBlock3D(nn.Module):
         if zq is not None:
             hidden_states = self.norm1(hidden_states, zq)
         else:
+            print("zq is None")
             hidden_states = self.norm1(hidden_states)
         print("reset hidden_states2 ", hidden_states.shape)
 
