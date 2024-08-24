@@ -861,6 +861,7 @@ class CogVideoXDecoder3D(nn.Module):
         hidden_states = self.conv_out(hidden_states)
         torch.cuda.synchronize()
         t4 = time.time()
+        print("decode 3d ", t4-t3,t3-t2,t2-t1)
         return hidden_states
 
 
