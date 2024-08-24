@@ -147,9 +147,11 @@ class CogVideoXCausalConv3d(nn.Module):
         self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone()
 
         padding_2d = (self.width_pad, self.width_pad, self.height_pad, self.height_pad)
+        print("before padding input_parallel ", input_parallel.shape)
         input_parallel = F.pad(input_parallel, padding_2d, mode="constant", value=0)
-
+        print("input_parallel ", input_parallel.shape)
         output_parallel = self.conv(input_parallel)
+        print("output_parallel ", output_parallel.shape)
         output = output_parallel
         return output
 
@@ -460,7 +462,6 @@ class CogVideoXMidBlock3D(nn.Module):
         temb: Optional[torch.Tensor] = None,
         zq: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        print("len ", len(self.resnets))
         for resnet in self.resnets:
             if self.training and self.gradient_checkpointing:
 
