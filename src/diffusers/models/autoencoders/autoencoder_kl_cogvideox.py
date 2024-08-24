@@ -280,7 +280,7 @@ class CogVideoXResnetBlock3D(nn.Module):
         import time
         t1 = time.time()
         hidden_states = inputs
-        print("reset hidden_states1 ", hidden_states.shape, zq.shape)
+        print("reset start hidden_states1 ", hidden_states.shape, zq.shape)
         if zq is not None:
             hidden_states = self.norm1(hidden_states, zq)
         else:
@@ -312,7 +312,7 @@ class CogVideoXResnetBlock3D(nn.Module):
         torch.cuda.synchronize()
         t4 = time.time()
         hidden_states = self.conv2(hidden_states)
-        print("reset hidden_states8 ", hidden_states.shape)
+        print("reset end hidden_states8 ", hidden_states.shape)
 
         torch.cuda.synchronize()
         t5 = time.time()
@@ -596,7 +596,9 @@ class CogVideoXUpBlock3D(nn.Module):
         # print("up block forward ", hidden_states.shape)
         if self.upsamplers is not None:
             for upsampler in self.upsamplers:
+                print("upsampler start ", hidden_states.shape)
                 hidden_states = upsampler(hidden_states)
+                print("upsampler end ", hidden_states.shape)
         print("up blocks 3 hidden_states ", hidden_states.shape)
         torch.cuda.synchronize()
         t3 = time.time()
