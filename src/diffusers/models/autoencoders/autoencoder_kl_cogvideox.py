@@ -473,9 +473,9 @@ class CogVideoXMidBlock3D(nn.Module):
                     create_custom_forward(resnet), hidden_states, temb, zq
                 )
             else:
-                print("before hidden states ", hidden_states.shape)
+                print("before resnet hidden states ", hidden_states.shape)
                 hidden_states = resnet(hidden_states, temb, zq)
-                print("after hidden states ", hidden_states.shape)
+                print("after resnet hidden states ", hidden_states.shape)
 
         return hidden_states
 
@@ -847,13 +847,13 @@ class CogVideoXDecoder3D(nn.Module):
             # 1. Mid
             print("before Mid decode hidden state ", hidden_states.shape)
             hidden_states = self.mid_block(hidden_states, temb, sample)
-            print("Mid decode hidden state ", hidden_states.shape)
+            print("after Mid decode hidden state ", hidden_states.shape)
 
             # 2. Up
             print("before up_block decode hidden state ", hidden_states.shape)
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
-            print("up_block decode hidden state ", hidden_states.shape)
+            print("after up_block decode hidden state ", hidden_states.shape)
 
         # 3. Post-process
         hidden_states = self.norm_out(hidden_states, sample)
