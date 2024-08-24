@@ -147,11 +147,8 @@ class CogVideoXCausalConv3d(nn.Module):
         self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone()
 
         padding_2d = (self.width_pad, self.width_pad, self.height_pad, self.height_pad)
-        print("before padding input_parallel ", input_parallel.shape)
         input_parallel = F.pad(input_parallel, padding_2d, mode="constant", value=0)
-        print("input_parallel ", input_parallel.shape)
         output_parallel = self.conv(input_parallel)
-        print("output_parallel ", output_parallel.shape)
         output = output_parallel
         return output
 
@@ -475,9 +472,7 @@ class CogVideoXMidBlock3D(nn.Module):
                     create_custom_forward(resnet), hidden_states, temb, zq
                 )
             else:
-                print("before resnet hidden states ", hidden_states.shape)
                 hidden_states = resnet(hidden_states, temb, zq)
-                print("after resnet hidden states ", hidden_states.shape)
 
         return hidden_states
 
@@ -847,20 +842,25 @@ class CogVideoXDecoder3D(nn.Module):
                 )
         else:
             # 1. Mid
-            print("before Mid decode hidden state ", hidden_states.shape)
+            import time
+            t1 = time.time()
             hidden_states = self.mid_block(hidden_states, temb, sample)
-            print("after Mid decode hidden state ", hidden_states.shape)
-
+            torch.cuda.synchronize()
+            t2 = time.time()
             # 2. Up
             # print("before up_block decode hidden state ", hidden_states.shape)
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
             # print("after up_block decode hidden state ", hidden_states.shape)
+            torch.cuda.synchronize()
+            t3 = time.time()
 
         # 3. Post-process
         hidden_states = self.norm_out(hidden_states, sample)
         hidden_states = self.conv_act(hidden_states)
         hidden_states = self.conv_out(hidden_states)
+        torch.cuda.synchronize()
+        t4 = time.time()
         return hidden_states
 
 
