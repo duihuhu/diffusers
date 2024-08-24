@@ -286,7 +286,9 @@ class CogVideoXResnetBlock3D(nn.Module):
             hidden_states = self.norm1(hidden_states)
 
         hidden_states = self.nonlinearity(hidden_states)
+        print("kernel size conv1 ", self.conv1.kernel_size, hidden_states.shape)
         hidden_states = self.conv1(hidden_states)
+        print("hidden_states size conv1 ", hidden_states.shape)
 
         if temb is not None:
             hidden_states = hidden_states + self.temb_proj(self.nonlinearity(temb))[:, :, None, None, None]
