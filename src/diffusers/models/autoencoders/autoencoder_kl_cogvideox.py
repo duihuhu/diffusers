@@ -287,8 +287,10 @@ class CogVideoXResnetBlock3D(nn.Module):
             hidden_states = self.norm1(hidden_states)
 
         hidden_states = self.nonlinearity(hidden_states)
+        torch.cuda.synchronize()
         t2 = time.time()
         hidden_states = self.conv1(hidden_states)
+        torch.cuda.synchronize()
         t3 = time.time()
         if temb is not None:
             hidden_states = hidden_states + self.temb_proj(self.nonlinearity(temb))[:, :, None, None, None]
@@ -300,12 +302,15 @@ class CogVideoXResnetBlock3D(nn.Module):
 
         hidden_states = self.nonlinearity(hidden_states)
         hidden_states = self.dropout(hidden_states)
+        torch.cuda.synchronize()
         t4 = time.time()
         hidden_states = self.conv2(hidden_states)
+        torch.cuda.synchronize()
         t5 = time.time()
 
         if self.in_channels != self.out_channels:
             inputs = self.conv_shortcut(inputs)
+        torch.cuda.synchronize()
         t6 = time.time()
         print("resenet time ", t6-t5, t5-t4, t4-t3, t3-t2, t2-t1)
         hidden_states = hidden_states + inputs
