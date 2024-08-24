@@ -319,6 +319,7 @@ class CogVideoXResnetBlock3D(nn.Module):
 
         if self.in_channels != self.out_channels:
             inputs = self.conv_shortcut(inputs)
+            print("in_channels!=self.out_channels:")
         torch.cuda.synchronize()
         t6 = time.time()
         print("resenet time ", t6-t5, t5-t4, t4-t3, t3-t2, t2-t1)
