@@ -849,6 +849,7 @@ class CogVideoXDecoder3D(nn.Module):
             t2 = time.time()
             # 2. Up
             # print("before up_block decode hidden state ", hidden_states.shape)
+            print("len up_block" , len(up_block))
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
             # print("after up_block decode hidden state ", hidden_states.shape)
@@ -857,11 +858,15 @@ class CogVideoXDecoder3D(nn.Module):
 
         # 3. Post-process
         hidden_states = self.norm_out(hidden_states, sample)
-        hidden_states = self.conv_act(hidden_states)
-        hidden_states = self.conv_out(hidden_states)
         torch.cuda.synchronize()
         t4 = time.time()
-        print("decode 3d ", t4-t3,t3-t2,t2-t1)
+        hidden_states = self.conv_act(hidden_states)
+        torch.cuda.synchronize()
+        t5 = time.time()
+        hidden_states = self.conv_out(hidden_states)
+        torch.cuda.synchronize()
+        t6 = time.time()
+        print("decode 3d ", t6-t5, t5-t4, t4-t3, t3-t2, t2-t1)
         return hidden_states
 
 
