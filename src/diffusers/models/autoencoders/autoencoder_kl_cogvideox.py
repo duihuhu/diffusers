@@ -107,6 +107,7 @@ class CogVideoXCausalConv3d(nn.Module):
 
         stride = (stride, 1, 1)
         dilation = (dilation, 1, 1)
+        print("kernel_size ", kernel_size)
         self.conv = CogVideoXSafeConv3d(
             in_channels=in_channels,
             out_channels=out_channels,
@@ -286,7 +287,7 @@ class CogVideoXResnetBlock3D(nn.Module):
             hidden_states = self.norm1(hidden_states)
 
         hidden_states = self.nonlinearity(hidden_states)
-        print("kernel size conv1 ", self.conv1.kernel_size, hidden_states.shape)
+        print("before hidden_states size conv1 ", hidden_states.shape)
         hidden_states = self.conv1(hidden_states)
         print("hidden_states size conv1 ", hidden_states.shape)
 
