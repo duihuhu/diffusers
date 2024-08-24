@@ -880,7 +880,9 @@ class CogVideoXDecoder3D(nn.Module):
             # print("before up_block decode hidden state ", hidden_states.shape)
             print("len up_block" , len(self.up_blocks))
             for up_block in self.up_blocks:
+                print("up block start ", hidden_states.shape)
                 hidden_states = up_block(hidden_states, temb, sample)
+                print("up block start end ", hidden_states.shape)
             # print("after up_block decode hidden state ", hidden_states.shape)
             torch.cuda.synchronize()
             t3 = time.time()
