@@ -849,7 +849,7 @@ class CogVideoXDecoder3D(nn.Module):
             t2 = time.time()
             # 2. Up
             # print("before up_block decode hidden state ", hidden_states.shape)
-            print("len up_block" , len(self.up_block))
+            print("len up_block" , len(self.up_blocks))
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
             # print("after up_block decode hidden state ", hidden_states.shape)
