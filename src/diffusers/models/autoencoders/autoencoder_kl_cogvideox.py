@@ -319,10 +319,9 @@ class CogVideoXResnetBlock3D(nn.Module):
 
         if self.in_channels != self.out_channels:
             inputs = self.conv_shortcut(inputs)
-            print("in_channels!=self.out_channels:")
         torch.cuda.synchronize()
         t6 = time.time()
-        print("resenet time ", t6-t5, t5-t4, t4-t3, t3-t2, t2-t1)
+
         hidden_states = hidden_states + inputs
         return hidden_states
 
@@ -882,7 +881,7 @@ class CogVideoXDecoder3D(nn.Module):
             for up_block in self.up_blocks:
                 print("up block start ", hidden_states.shape, sample.shape)
                 hidden_states = up_block(hidden_states, temb, sample)
-                print("up block start end ", hidden_states.shape)
+                print("up block end ", hidden_states.shape)
             # print("after up_block decode hidden state ", hidden_states.shape)
             torch.cuda.synchronize()
             t3 = time.time()
