@@ -280,16 +280,19 @@ class CogVideoXResnetBlock3D(nn.Module):
         import time
         t1 = time.time()
         hidden_states = inputs
-
+        print("reset hidden_states1 ", hidden_states.shape)
         if zq is not None:
             hidden_states = self.norm1(hidden_states, zq)
         else:
             hidden_states = self.norm1(hidden_states)
+        print("reset hidden_states2 ", hidden_states.shape)
 
         hidden_states = self.nonlinearity(hidden_states)
+        print("reset hidden_states3 ", hidden_states.shape)
         torch.cuda.synchronize()
         t2 = time.time()
         hidden_states = self.conv1(hidden_states)
+        print("reset hidden_states4 ", hidden_states.shape)
         torch.cuda.synchronize()
         t3 = time.time()
         if temb is not None:
@@ -299,12 +302,18 @@ class CogVideoXResnetBlock3D(nn.Module):
             hidden_states = self.norm2(hidden_states, zq)
         else:
             hidden_states = self.norm2(hidden_states)
+        print("reset hidden_states5 ", hidden_states.shape)
 
         hidden_states = self.nonlinearity(hidden_states)
+        print("reset hidden_states6 ", hidden_states.shape)
+
         hidden_states = self.dropout(hidden_states)
+        print("reset hidden_states7 ", hidden_states.shape)
         torch.cuda.synchronize()
         t4 = time.time()
         hidden_states = self.conv2(hidden_states)
+        print("reset hidden_states8 ", hidden_states.shape)
+
         torch.cuda.synchronize()
         t5 = time.time()
 
