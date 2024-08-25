@@ -140,15 +140,21 @@ class CogVideoXCausalConv3d(nn.Module):
         self.conv_cache = None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        print("cogvideo conv3d input shape ", inputs.shape)
         input_parallel = self.fake_context_parallel_forward(inputs)
+        print("cogvideo conv3d input_parallel shape ", input_parallel.shape)
 
         self._clear_fake_context_parallel_cache()
         # self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone().cpu()
         self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone()
+        print("cogvideo conv3d self.conv_cache shape ", self.conv_cache.shape)
 
         padding_2d = (self.width_pad, self.width_pad, self.height_pad, self.height_pad)
+        print("cogvideo conv3d before padding input_parallel shape ", input_parallel.shape)
         input_parallel = F.pad(input_parallel, padding_2d, mode="constant", value=0)
+        print("cogvideo conv3d after padding input_parallel shape ", input_parallel.shape)
         output_parallel = self.conv(input_parallel)
+        print("cogvideo conv3d self.conv input_parallel shape ", input_parallel.shape)
         output = output_parallel
         return output
 
@@ -596,9 +602,7 @@ class CogVideoXUpBlock3D(nn.Module):
         # print("up block forward ", hidden_states.shape)
         if self.upsamplers is not None:
             for upsampler in self.upsamplers:
-                print("upsampler start ", hidden_states.shape)
                 hidden_states = upsampler(hidden_states)
-                print("upsampler end ", hidden_states.shape)
         print("up blocks 3 hidden_states ", hidden_states.shape)
         torch.cuda.synchronize()
         t3 = time.time()
@@ -874,17 +878,17 @@ class CogVideoXDecoder3D(nn.Module):
             # 1. Mid
             import time
             t1 = time.time()
+            print("mid_block start ")
             hidden_states = self.mid_block(hidden_states, temb, sample)
+            print("mid_block end ")
             torch.cuda.synchronize()
             t2 = time.time()
             # 2. Up
             # print("before up_block decode hidden state ", hidden_states.shape)
-            print("len up_block" , len(self.up_blocks))
+            print("up block start ", hidden_states.shape, sample.shape)
             for up_block in self.up_blocks:
-                print("up block start ", hidden_states.shape, sample.shape)
                 hidden_states = up_block(hidden_states, temb, sample)
-                print("up block end ", hidden_states.shape)
-            # print("after up_block decode hidden state ", hidden_states.shape)
+            print("up block end ", hidden_states.shape)
             torch.cuda.synchronize()
             t3 = time.time()
 
