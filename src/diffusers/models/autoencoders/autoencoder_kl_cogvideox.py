@@ -295,12 +295,12 @@ class CogVideoXResnetBlock3D(nn.Module):
 
         hidden_states = self.nonlinearity(hidden_states)
         # print("reset hidden_states3 ", hidden_states.shape)
-        torch.cuda.synchronize()
-        t2 = time.time()
+        # torch.cuda.synchronize()
+        # t2 = time.time()
         hidden_states = self.conv1(hidden_states)
         # print("reset hidden_states4 ", hidden_states.shape)
-        torch.cuda.synchronize()
-        t3 = time.time()
+        # torch.cuda.synchronize()
+        # t3 = time.time()
         if temb is not None:
             hidden_states = hidden_states + self.temb_proj(self.nonlinearity(temb))[:, :, None, None, None]
 
@@ -315,18 +315,18 @@ class CogVideoXResnetBlock3D(nn.Module):
 
         hidden_states = self.dropout(hidden_states)
         # print("reset hidden_states7 ", hidden_states.shape)
-        torch.cuda.synchronize()
-        t4 = time.time()
+        # torch.cuda.synchronize()
+        # t4 = time.time()
         hidden_states = self.conv2(hidden_states)
         # print("reset end hidden_states8 ", hidden_states.shape)
 
-        torch.cuda.synchronize()
-        t5 = time.time()
+        # torch.cuda.synchronize()
+        # t5 = time.time()
 
         if self.in_channels != self.out_channels:
             inputs = self.conv_shortcut(inputs)
-        torch.cuda.synchronize()
-        t6 = time.time()
+        # torch.cuda.synchronize()
+        # t6 = time.time()
 
         hidden_states = hidden_states + inputs
         return hidden_states
@@ -580,8 +580,8 @@ class CogVideoXUpBlock3D(nn.Module):
     ) -> torch.Tensor:
         r"""Forward method of the `CogVideoXUpBlock3D` class."""
         import time
-        t1 = time.time()
-        print("up blocks 1 hidden_states ", hidden_states.shape, zq.shape)
+        # t1 = time.time()
+        # print("up blocks 1 hidden_states ", hidden_states.shape, zq.shape)
         for resnet in self.resnets:
             if self.training and self.gradient_checkpointing:
 
@@ -596,17 +596,17 @@ class CogVideoXUpBlock3D(nn.Module):
                 )
             else:
                 hidden_states = resnet(hidden_states, temb, zq)
-        print("up blocks 2 hidden_states ", hidden_states.shape)
-        torch.cuda.synchronize()
-        t2 = time.time()
+        # print("up blocks 2 hidden_states ", hidden_states.shape)
+        # torch.cuda.synchronize()
+        # t2 = time.time()
         # print("up block forward ", hidden_states.shape)
         if self.upsamplers is not None:
             for upsampler in self.upsamplers:
                 hidden_states = upsampler(hidden_states)
-        print("up blocks 3 hidden_states ", hidden_states.shape)
-        torch.cuda.synchronize()
-        t3 = time.time()
-        print("up blocks time ", t3-t2, t2-t1)
+        # print("up blocks 3 hidden_states ", hidden_states.shape)
+        # torch.cuda.synchronize()
+        # t3 = time.time()
+        # print("up blocks time ", t3-t2, t2-t1)
         return hidden_states
 
 
@@ -876,33 +876,33 @@ class CogVideoXDecoder3D(nn.Module):
                 )
         else:
             # 1. Mid
-            import time
-            t1 = time.time()
-            print("mid_block start ")
+            # import time
+            # t1 = time.time()
+            # print("mid_block start ")
             hidden_states = self.mid_block(hidden_states, temb, sample)
-            print("mid_block end ")
-            torch.cuda.synchronize()
-            t2 = time.time()
+            # print("mid_block end ")
+            # torch.cuda.synchronize()
+            # t2 = time.time()
             # 2. Up
             # print("before up_block decode hidden state ", hidden_states.shape)
-            print("up block start ", hidden_states.shape, sample.shape)
+            # print("up block start ", hidden_states.shape, sample.shape)
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
-            print("up block end ", hidden_states.shape)
-            torch.cuda.synchronize()
-            t3 = time.time()
+            # print("up block end ", hidden_states.shape)
+            # torch.cuda.synchronize()
+            # t3 = time.time()
 
         # 3. Post-process
         hidden_states = self.norm_out(hidden_states, sample)
-        torch.cuda.synchronize()
-        t4 = time.time()
+        # torch.cuda.synchronize()
+        # t4 = time.time()
         hidden_states = self.conv_act(hidden_states)
-        torch.cuda.synchronize()
-        t5 = time.time()
+        # torch.cuda.synchronize()
+        # t5 = time.time()
         hidden_states = self.conv_out(hidden_states)
-        torch.cuda.synchronize()
-        t6 = time.time()
-        print("decode 3d ", t6-t5, t5-t4, t4-t3, t3-t2, t2-t1)
+        # torch.cuda.synchronize()
+        # t6 = time.time()
+        # print("decode 3d ", t6-t5, t5-t4, t4-t3, t3-t2, t2-t1)
         return hidden_states
 
 
