@@ -2207,9 +2207,9 @@ class AttnProcessor2_0:
 
         key = key.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
         value = value.view(batch_size, -1, attn.heads, head_dim).transpose(1, 2)
-        print("view query ", query.shape)
-        print("view key ", key.shape)
-        print("view value ", value.shape)
+        # print("view query ", query.shape)
+        # print("view key ", key.shape)
+        # print("view value ", value.shape)
 
         if attn.norm_q is not None:
             query = attn.norm_q(query)

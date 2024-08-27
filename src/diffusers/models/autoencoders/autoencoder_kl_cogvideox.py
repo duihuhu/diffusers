@@ -140,21 +140,21 @@ class CogVideoXCausalConv3d(nn.Module):
         self.conv_cache = None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        print("cogvideo conv3d input shape ", inputs.shape)
+        # print("cogvideo conv3d input shape ", inputs.shape)
         input_parallel = self.fake_context_parallel_forward(inputs)
-        print("cogvideo conv3d input_parallel shape ", input_parallel.shape)
+        # print("cogvideo conv3d input_parallel shape ", input_parallel.shape)
 
         self._clear_fake_context_parallel_cache()
         # self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone().cpu()
         self.conv_cache = input_parallel[:, :, -self.time_kernel_size + 1 :].contiguous().detach().clone()
-        print("cogvideo conv3d self.conv_cache shape ", self.conv_cache.shape)
+        # print("cogvideo conv3d self.conv_cache shape ", self.conv_cache.shape)
 
         padding_2d = (self.width_pad, self.width_pad, self.height_pad, self.height_pad)
-        print("cogvideo conv3d before padding input_parallel shape ", input_parallel.shape)
+        # print("cogvideo conv3d before padding input_parallel shape ", input_parallel.shape)
         input_parallel = F.pad(input_parallel, padding_2d, mode="constant", value=0)
-        print("cogvideo conv3d after padding input_parallel shape ", input_parallel.shape)
+        # print("cogvideo conv3d after padding input_parallel shape ", input_parallel.shape)
         output_parallel = self.conv(input_parallel)
-        print("cogvideo conv3d self.conv input_parallel shape ", input_parallel.shape)
+        # print("cogvideo conv3d self.conv input_parallel shape ", input_parallel.shape)
         output = output_parallel
         return output
 
@@ -286,19 +286,19 @@ class CogVideoXResnetBlock3D(nn.Module):
         import time
         t1 = time.time()
         hidden_states = inputs
-        print("reset start hidden_states1 ", hidden_states.shape, zq.shape)
+        # print("reset start hidden_states1 ", hidden_states.shape, zq.shape)
         if zq is not None:
             hidden_states = self.norm1(hidden_states, zq)
         else:
             hidden_states = self.norm1(hidden_states)
-        print("reset hidden_states2 ", hidden_states.shape)
+        # print("reset hidden_states2 ", hidden_states.shape)
 
         hidden_states = self.nonlinearity(hidden_states)
-        print("reset hidden_states3 ", hidden_states.shape)
+        # print("reset hidden_states3 ", hidden_states.shape)
         torch.cuda.synchronize()
         t2 = time.time()
         hidden_states = self.conv1(hidden_states)
-        print("reset hidden_states4 ", hidden_states.shape)
+        # print("reset hidden_states4 ", hidden_states.shape)
         torch.cuda.synchronize()
         t3 = time.time()
         if temb is not None:
@@ -308,17 +308,17 @@ class CogVideoXResnetBlock3D(nn.Module):
             hidden_states = self.norm2(hidden_states, zq)
         else:
             hidden_states = self.norm2(hidden_states)
-        print("reset hidden_states5 ", hidden_states.shape)
+        # print("reset hidden_states5 ", hidden_states.shape)
 
         hidden_states = self.nonlinearity(hidden_states)
-        print("reset hidden_states6 ", hidden_states.shape)
+        # print("reset hidden_states6 ", hidden_states.shape)
 
         hidden_states = self.dropout(hidden_states)
-        print("reset hidden_states7 ", hidden_states.shape)
+        # print("reset hidden_states7 ", hidden_states.shape)
         torch.cuda.synchronize()
         t4 = time.time()
         hidden_states = self.conv2(hidden_states)
-        print("reset end hidden_states8 ", hidden_states.shape)
+        # print("reset end hidden_states8 ", hidden_states.shape)
 
         torch.cuda.synchronize()
         t5 = time.time()
