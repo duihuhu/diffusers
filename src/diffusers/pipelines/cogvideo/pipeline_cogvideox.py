@@ -310,6 +310,7 @@ class CogVideoXPipeline(DiffusionPipeline):
     def prepare_latents(
         self, batch_size, num_channels_latents, num_frames, height, width, dtype, device, generator, latents=None
     ):
+        print("(num_frames - 1) // self.vae_scale_factor_temporal + 1", (num_frames - 1) // self.vae_scale_factor_temporal + 1)
         shape = (
             batch_size,
             (num_frames - 1) // self.vae_scale_factor_temporal + 1,
