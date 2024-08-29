@@ -286,7 +286,7 @@ class CogVideoXResnetBlock3D(nn.Module):
         import time
         t1 = time.time()
         hidden_states = inputs
-        # print("reset start hidden_states1 ", hidden_states.shape, zq.shape)
+        print("reset start hidden_states1 ", hidden_states.shape, zq.shape)
         if zq is not None:
             hidden_states = self.norm1(hidden_states, zq)
         else:
@@ -870,6 +870,7 @@ class CogVideoXDecoder3D(nn.Module):
             )
 
             # 2. Up
+            print("up_blocks start ")
             for up_block in self.up_blocks:
                 hidden_states = torch.utils.checkpoint.checkpoint(
                     create_custom_forward(up_block), hidden_states, temb, sample
