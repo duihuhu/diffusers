@@ -42,7 +42,7 @@ class CogVideoXSafeConv3d(nn.Conv3d):
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         memory_count = torch.prod(torch.tensor(input.shape)).item() * 2 / 1024**3
-
+        print("CogVideoXSafeConv3d forward conv3d input shape ", self.in_channels, self.out_channels, self.kernel_size, input.shape)
         # Set to 2GB, suitable for CuDNN
         if memory_count > 2:
             kernel_size = self.kernel_size[0]
