@@ -870,7 +870,6 @@ class CogVideoXDecoder3D(nn.Module):
             )
 
             # 2. Up
-            print("up_blocks start ")
             for up_block in self.up_blocks:
                 hidden_states = torch.utils.checkpoint.checkpoint(
                     create_custom_forward(up_block), hidden_states, temb, sample
@@ -886,7 +885,7 @@ class CogVideoXDecoder3D(nn.Module):
             # t2 = time.time()
             # 2. Up
             # print("before up_block decode hidden state ", hidden_states.shape)
-            # print("up block start ", hidden_states.shape, sample.shape)
+            print("up block start ", hidden_states.shape, sample.shape)
             for up_block in self.up_blocks:
                 hidden_states = up_block(hidden_states, temb, sample)
             # print("up block end ", hidden_states.shape)
