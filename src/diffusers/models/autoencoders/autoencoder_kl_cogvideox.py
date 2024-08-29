@@ -607,7 +607,7 @@ class CogVideoXUpBlock3D(nn.Module):
         if self.upsamplers is not None:
             for upsampler in self.upsamplers:
                 hidden_states = upsampler(hidden_states)
-        # print("up blocks 3 hidden_states ", hidden_states.shape)
+        print("up blocks end hidden_states ", hidden_states.shape)
         # torch.cuda.synchronize()
         # t3 = time.time()
         # print("up blocks time ", t3-t2, t2-t1)
