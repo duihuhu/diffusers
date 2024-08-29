@@ -156,6 +156,7 @@ class CogVideoXCausalConv3d(nn.Module):
         output_parallel = self.conv(input_parallel)
         # print("cogvideo conv3d self.conv input_parallel shape ", input_parallel.shape)
         output = output_parallel
+        print("CogVideoXCausalConv3d output shape ", output.shape)
         return output
 
 
@@ -196,6 +197,7 @@ class CogVideoXSpatialNorm3D(nn.Module):
             zq = F.interpolate(zq, size=f.shape[-3:])
 
         norm_f = self.norm_layer(f)
+        print("CogVideoXSpatialNorm3D norm_f shape ", norm_f.shape)
         new_f = norm_f * self.conv_y(zq) + self.conv_b(zq)
         return new_f
 
