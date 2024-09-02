@@ -877,7 +877,8 @@ class PixArtAlphaPipeline(DiffusionPipeline):
 
         # 6. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
         extra_step_kwargs = self.prepare_extra_step_kwargs(generator, eta)
-
+        import time
+        t1 = time.time
         # 6.1 Prepare micro-conditions.
         added_cond_kwargs = {"resolution": None, "aspect_ratio": None}
         if self.transformer.config.sample_size == 128:
@@ -949,13 +950,16 @@ class PixArtAlphaPipeline(DiffusionPipeline):
                     if callback is not None and i % callback_steps == 0:
                         step_idx = i // getattr(self.scheduler, "order", 1)
                         callback(step_idx, t, latents)
-
+        torch.cuda.synchronize() 
+        t2 = time.time()
         if not output_type == "latent":
             image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
             if use_resolution_binning:
                 image = self.image_processor.resize_and_crop_tensor(image, orig_width, orig_height)
         else:
             image = latents
+        torch.cuda.synchronize() 
+        t3 = time.time()
 
         if not output_type == "latent":
             image = self.image_processor.postprocess(image, output_type=output_type)
