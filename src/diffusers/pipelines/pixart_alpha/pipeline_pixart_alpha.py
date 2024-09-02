@@ -960,7 +960,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
             image = latents
         torch.cuda.synchronize() 
         t3 = time.time()
-
+        print("execute time ", t3-t2, t2-t1)
         if not output_type == "latent":
             image = self.image_processor.postprocess(image, output_type=output_type)
 
