@@ -34,7 +34,7 @@ from ...utils import (
 )
 from ...utils.torch_utils import randn_tensor
 from ..pipeline_utils import DiffusionPipeline
-
+import time
 
 if is_torch_xla_available():
     import torch_xla.core.xla_model as xm
@@ -815,6 +815,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
         # 8. Denoising loop
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
+        t1 = time.time()
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 if self.interrupt:
@@ -876,9 +877,14 @@ class HunyuanDiTPipeline(DiffusionPipeline):
 
                 if XLA_AVAILABLE:
                     xm.mark_step()
+        torch.cuda.synchronize() 
+        t2 = time.time()
 
         if not output_type == "latent":
             image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
+            torch.cuda.synchronize() 
+            t3 = time.time()
+            print("execute time ", t3-t2, t2-t1)
             image, has_nsfw_concept = self.run_safety_checker(image, device, prompt_embeds.dtype)
         else:
             image = latents
