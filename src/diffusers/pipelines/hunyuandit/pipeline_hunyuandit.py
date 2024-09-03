@@ -241,14 +241,12 @@ class HunyuanDiTPipeline(DiffusionPipeline):
 
     def encode_prompt(
         self,
-        # prompt: str,
-        prompt: Union[str, List[str]] = None,
+        prompt: str,
         device: torch.device = None,
         dtype: torch.dtype = None,
         num_images_per_prompt: int = 1,
         do_classifier_free_guidance: bool = True,
-        # negative_prompt: Optional[str] = None,
-        negative_prompt: Optional[Union[str, List[str]]] = None,
+        negative_prompt: Optional[str] = None,
         prompt_embeds: Optional[torch.Tensor] = None,
         negative_prompt_embeds: Optional[torch.Tensor] = None,
         prompt_attention_mask: Optional[torch.Tensor] = None,
