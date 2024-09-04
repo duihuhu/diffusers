@@ -241,7 +241,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
 
     def encode_prompt(
         self,
-        prompt: str,
+        prompt: Union[str, List[str]],
         device: torch.device = None,
         dtype: torch.dtype = None,
         num_images_per_prompt: int = 1,
