@@ -241,7 +241,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
 
     def encode_prompt(
         self,
-        prompt: Union[str, List[str]],
+        prompt: Union[str, List[str]] = None,
         device: torch.device = None,
         dtype: torch.dtype = None,
         num_images_per_prompt: int = 1,
@@ -320,7 +320,6 @@ class HunyuanDiTPipeline(DiffusionPipeline):
             batch_size = prompt_embeds.shape[0]
 
         if prompt_embeds is None:
-            print("prompt ", prompt)
             text_inputs = tokenizer(
                 prompt,
                 padding="max_length",
