@@ -320,6 +320,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
             batch_size = prompt_embeds.shape[0]
 
         if prompt_embeds is None:
+            print("prompt ", prompt)
             text_inputs = tokenizer(
                 prompt,
                 padding="max_length",
