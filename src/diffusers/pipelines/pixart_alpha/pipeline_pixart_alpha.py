@@ -397,6 +397,7 @@ class PixArtAlphaPipeline(DiffusionPipeline):
             uncond_tokens = [negative_prompt] * batch_size if isinstance(negative_prompt, str) else negative_prompt
             uncond_tokens = self._text_preprocessing(uncond_tokens, clean_caption=clean_caption)
             max_length = prompt_embeds.shape[1]
+            print("uncond_tokens ", uncond_tokens)
             uncond_input = self.tokenizer(
                 uncond_tokens,
                 padding="max_length",
