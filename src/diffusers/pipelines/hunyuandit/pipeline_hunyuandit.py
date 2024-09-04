@@ -386,7 +386,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
             )
 
             negative_prompt_attention_mask = uncond_input.attention_mask.to(device)
-            negative_prompt_embeds = text_encoder(
+            negative_prompt_embeds = self.text_encoder(
                 uncond_input.input_ids.to(device),
                 attention_mask=negative_prompt_attention_mask,
             )
