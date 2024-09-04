@@ -341,7 +341,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
                 )
 
             prompt_attention_mask = text_inputs.attention_mask.to(device)
-            prompt_embeds = text_encoder(
+            prompt_embeds = self.text_encoder(
                 text_input_ids.to(device),
                 attention_mask=prompt_attention_mask,
             )
