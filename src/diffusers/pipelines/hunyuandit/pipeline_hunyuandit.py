@@ -377,7 +377,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
                 uncond_tokens = negative_prompt
 
             max_length = prompt_embeds.shape[1]
-            uncond_input = tokenizer(
+            uncond_input = self.tokenizer(
                 uncond_tokens,
                 padding="max_length",
                 max_length=max_length,
