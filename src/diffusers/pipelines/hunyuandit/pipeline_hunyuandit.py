@@ -361,13 +361,14 @@ class HunyuanDiTPipeline(DiffusionPipeline):
             print("negative_prompt ", type(negative_prompt), negative_prompt is None) 
             if negative_prompt is None:
                 uncond_tokens = [""] * batch_size
+            elif isinstance(negative_prompt, str):
+                uncond_tokens = [negative_prompt] * batch_size
             elif prompt is not None and type(prompt) is not type(negative_prompt):
                 raise TypeError(
                     f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !="
                     f" {type(prompt)}."
                 )
-            elif isinstance(negative_prompt, str):
-                uncond_tokens = [negative_prompt]
+
             elif batch_size != len(negative_prompt):
                 raise ValueError(
                     f"`negative_prompt`: {negative_prompt} has batch size {len(negative_prompt)}, but `prompt`:"
