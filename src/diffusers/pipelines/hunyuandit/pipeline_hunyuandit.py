@@ -241,7 +241,7 @@ class HunyuanDiTPipeline(DiffusionPipeline):
 
     def encode_prompt(
         self,
-        prompt: Union[str, List[str]] = None,
+        prompt: str,
         device: torch.device = None,
         dtype: torch.dtype = None,
         num_images_per_prompt: int = 1,
@@ -358,17 +358,15 @@ class HunyuanDiTPipeline(DiffusionPipeline):
         # get unconditional embeddings for classifier free guidance
         if do_classifier_free_guidance and negative_prompt_embeds is None:
             uncond_tokens: List[str]
-            print("negative_prompt ", type(negative_prompt), negative_prompt is None) 
             if negative_prompt is None:
                 uncond_tokens = [""] * batch_size
-            elif isinstance(negative_prompt, str):
-                uncond_tokens = [negative_prompt] * batch_size
             elif prompt is not None and type(prompt) is not type(negative_prompt):
                 raise TypeError(
                     f"`negative_prompt` should be the same type to `prompt`, but got {type(negative_prompt)} !="
                     f" {type(prompt)}."
                 )
-
+            elif isinstance(negative_prompt, str):
+                uncond_tokens = [negative_prompt]
             elif batch_size != len(negative_prompt):
                 raise ValueError(
                     f"`negative_prompt`: {negative_prompt} has batch size {len(negative_prompt)}, but `prompt`:"
